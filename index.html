@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101820">
+  <meta name="description" content="Kostenloser, markenunabhängiger Photovoltaik-Rechner für Eigenheime in Deutschland.">
+  <title>PV-Rechner Deutschland – unabhängig & kostenlos</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="PV Rechner Startseite"><span class="brand-mark">☀</span><span>PV<span class="brand-light">RECHNER</span></span></a>
+    <span class="header-note">Unabhängig. Kostenlos. Transparent.</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">PHOTOVOLTAIK FÜR DEIN ZUHAUSE</p>
+        <h1>Was kann dein Dach für dich leisten?</h1>
+        <p class="intro">Berechne unverbindlich die mögliche Größe deiner Solaranlage, deinen Eigenverbrauch und das jährliche Sparpotenzial – ohne Herstellerbindung und ohne Anmeldung.</p>
+        <a class="primary-link" href="#rechner">Jetzt berechnen <span aria-hidden="true">↓</span></a>
+      </div>
+      <div class="sun-graphic" aria-hidden="true"><div class="sun-core"></div><div class="sun-orbit"></div><div class="panel-graphic"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+    </section>
+
+    <section class="calculator-section" id="rechner">
+      <div class="section-heading">
+        <p class="eyebrow">DEIN ZUHAUSE · DEINE ZAHLEN</p>
+        <h2>Photovoltaik-Potenzial berechnen</h2>
+        <p>Ändere die Werte – die Ergebnisse aktualisieren sich automatisch.</p>
+      </div>
+
+      <div class="calculator-layout">
+        <form id="pv-form" class="input-panel">
+          <div class="form-heading"><span class="step">01</span><div><h3>Angaben zum Haus</h3><p>Die wichtigsten Eckdaten deiner Immobilie</p></div></div>
+          <label for="consumption">Jährlicher Stromverbrauch <span class="unit">kWh/Jahr</span></label>
+          <input id="consumption" type="number" min="500" max="30000" step="100" value="4000" required>
+          <div class="field-hint">Findest du auf deiner letzten Stromabrechnung.</div>
+
+          <label for="roof-area">Nutzbare Dachfläche <span class="unit">m²</span></label>
+          <input id="roof-area" type="number" min="6" max="500" step="1" value="50" required>
+          <div class="field-hint">Abzüglich Fenster, Gauben und dauerhaft verschatteter Flächen.</div>
+
+          <div class="two-columns">
+            <div><label for="orientation">Dachausrichtung</label><select id="orientation"><option value="1">Süd</option><option value="0.94">Südost / Südwest</option><option value="0.85" selected>Ost / West</option><option value="0.72">Nordost / Nordwest</option><option value="0.62">Nord</option></select></div>
+            <div><label for="tilt">Dachneigung</label><select id="tilt"><option value="0.92">Flach (0–10°)</option><option value="0.98">Leicht (11–25°)</option><option value="1" selected>Mittel (26–40°)</option><option value="0.96">Steil (41–60°)</option><option value="0.88">Sehr steil (über 60°)</option></select></div>
+          </div>
+
+          <div class="form-heading second"><span class="step">02</span><div><h3>Deine Kosten & Ausstattung</h3><p>Für eine individuelle Beispielrechnung</p></div></div>
+          <label for="electricity-price">Strompreis <span class="unit">€/kWh</span></label>
+          <input id="electricity-price" type="number" min="0.05" max="1" step="0.01" value="0.32" required>
+          <label for="feed-in">Einspeisevergütung <span class="unit">€/kWh</span></label>
+          <input id="feed-in" type="number" min="0" max="1" step="0.001" value="0.079" required>
+          <label for="battery">Batteriespeicher <span class="unit">kWh</span></label>
+          <input id="battery" type="number" min="0" max="30" step="0.5" value="5">
+          <div class="field-hint">0 kWh = Berechnung ohne Speicher.</div>
+          <label for="system-cost">Geschätzter Anlagenpreis <span class="unit">€/kWp</span></label>
+          <input id="system-cost" type="number" min="500" max="5000" step="50" value="1600">
+          <label for="battery-cost">Speicherpreis <span class="unit">€/kWh</span></label>
+          <input id="battery-cost" type="number" min="100" max="2000" step="50" value="600">
+          <button class="reset-button" type="reset">Eingaben zurücksetzen</button>
+        </form>
+
+        <section class="results-panel" aria-live="polite" aria-label="Berechnungsergebnisse">
+          <div class="results-top"><div><p class="eyebrow">DEINE ERSTE SCHÄTZUNG</p><h3>Dein PV-Ergebnis</h3></div><span class="live-dot">Live-Berechnung</span></div>
+          <div class="main-result"><span>Empfohlene Anlagenleistung</span><strong id="system-size">– <small>kWp</small></strong><p id="panel-count">–</p></div>
+          <div class="metrics-grid">
+            <article class="metric"><span>Jahresertrag</span><strong id="yield">–</strong><small>kWh/Jahr</small></article>
+            <article class="metric"><span>Eigenverbrauch</span><strong id="self-use">–</strong><small id="self-use-detail">kWh/Jahr</small></article>
+            <article class="metric"><span>Stromkostenersparnis</span><strong id="savings">–</strong><small>pro Jahr</small></article>
+            <article class="metric"><span>Amortisationszeit</span><strong id="payback">–</strong><small id="investment">geschätzte Investition</small></article>
+          </div>
+          <div class="energy-bar-wrap"><div class="bar-label"><span>Verwendung des Solarstroms</span><span id="coverage">–</span></div><div class="energy-bar"><span id="used-bar"></span><span id="export-bar"></span></div><div class="legend"><span><i class="legend-own"></i>Eigenverbrauch</span><span><i class="legend-export"></i>Einspeisung</span></div></div>
+          <div class="assumption-box"><strong>Was bedeutet das?</strong><p id="summary">Gib deine Daten ein, um eine erste Orientierung zu erhalten.</p></div>
+          <p class="disclaimer">Wichtiger Hinweis: Dies ist eine vereinfachte Modellrechnung, keine Ertragsgarantie und kein verbindliches Angebot. Verschattung, Standort, Statik, Netzanschluss, Steuern, Finanzierung, laufende Kosten und aktuelle Vergütungssätze können das Ergebnis verändern. Vor einer Investition ist eine fachliche Prüfung vor Ort erforderlich.</p>
+        </section>
+      </div>
+    </section>
+  </main>
+  <footer><span>PV-RECHNER DEUTSCHLAND</span><span>Markenunabhängig · Ohne Anmeldung · MIT License</span></footer>
+</body>
+</html>
