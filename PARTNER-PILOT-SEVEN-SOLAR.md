@@ -39,7 +39,7 @@ Guten Tag,
 
 ich habe gesehen, dass Seven Solar unabhängige Photovoltaikberatung in Hamburg anbietet. Dazu habe ich einen kostenlosen, markenunabhängigen PV-Rechner für Eigenheime in Deutschland entwickelt.
 
-Der Rechner bietet eine erste Orientierung zu Anlagengröße, geschätztem Jahresertrag, Eigenverbrauch und Wirtschaftlichkeit. Nutzer können ihren Standort und ihre eigenen Annahmen eingeben. Die Berechnung läuft im Browser; Eingaben und Ergebnisse werden nicht an mich übertragen. Auf Wunsch führt ein Kontakt-Button direkt zu Ihrer Kontaktseite.
+Der Rechner bietet eine erste Orientierung zu Anlagengröße, geschätztem Jahresertrag, Eigenverbrauch und Wirtschaftlichkeit. Nutzer können ihren Standort und ihre eigenen Annahmen eingeben. Die Berechnung läuft im Browser. Die Standortsuche bzw. Koordinatenabfrage nutzt Open-Meteo; die übrigen Rechner-Eingaben und Ergebnisse werden nicht an mich oder Seven Solar übertragen. Auf Wunsch führt ein Kontakt-Button direkt zu Ihrer Kontaktseite.
 
 Ich möchte Ihnen einen 14-tägigen, unverbindlichen Test anbieten. Wenn das Werkzeug für Ihre Erstberatung nützlich ist, kann ich anschließend die individuelle Einrichtung für 149 € einmalig sowie laufende Betreuung, Updates und Support für 49 € pro Monat anbieten. Der Quellcode selbst steht unter MIT-Lizenz und kann von Ihnen auch kostenlos selbst betrieben werden. Es gibt aktuell ausdrücklich kein Lead-Tracking und keine automatische Übermittlung von Anfragen.
 
