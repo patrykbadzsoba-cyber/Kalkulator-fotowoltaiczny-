@@ -7,8 +7,7 @@ const resultsPanel = document.querySelector(".results-panel");
 
 function clearResults() {
   ["system-size","panel-count","yield","self-use","self-use-detail","savings","payback","investment","coverage","summary"].forEach((id) => {
-    if (id === "system-size") el(id).textContent = "–";
-    else el(id).textContent = "–";
+    el(id).textContent = "–";
   });
   el("used-bar").style.width = "0%";
   el("export-bar").style.width = "0%";
@@ -24,8 +23,13 @@ function calculate() {
   resultsPanel.classList.remove("has-error");
   const raw = ["consumption","roof-area","electricity-price","feed-in","battery","system-cost","battery-cost"];
   for (const id of raw) {
-    if (el(id).value.trim() === "") return fail("Bitte fülle alle Eingabefelder aus. Leere Werte können nicht berechnet werden.");
-    if (!Number.isFinite(Number(el(id).value))) return fail("Bitte gib gültige Zahlen in allen Feldern ein.");
+    const field = el(id);
+    if (field.value.trim() === "") return fail("Bitte fülle alle Eingabefelder aus. Leere Werte können nicht berechnet werden.");
+    if (!Number.isFinite(Number(field.value))) return fail("Bitte gib gültige Zahlen in allen Feldern ein.");
+    if (!field.checkValidity()) {
+      const label = document.querySelector('label[for="' + id + '"]')?.textContent.trim() || id;
+      return fail("Bitte prüfe den Wert für „" + label + "“. Er liegt außerhalb des zulässigen Eingabebereichs.");
+    }
   }
   const consumption = Number(el("consumption").value);
   const roofArea = Number(el("roof-area").value);
