@@ -18,10 +18,12 @@ Die Anwendung besteht aus statischen Dateien. Öffne `index.html` lokal im Brows
 
 ## Modellannahmen
 
-- Rund 6 m² Dachfläche je kWp installierter Leistung
+- Rund 4,5 m² nutzbare Dachfläche je kWp installierter Leistung (vereinfachter Planungswert)
 - Standard-Ertragsbasis: 950 kWh je kWp und Jahr, angepasst mit vereinfachten Ausrichtungs- und Neigungsfaktoren
 - Eigenverbrauchsquote als vereinfachtes Modell, abhängig von der Speichergröße
 - Beispielmodul: 430 Wp
+- Zahlen- und Währungsformat nach deutschem Gebietsschema (z. B. 1.575,10 €)
+- Eingabeprüfung für leere bzw. ungültige Werte und Warnung bei begrenzter Dachfläche
 - Anlagen- und Speicherpreise sind frei änderbare Beispielwerte, keine Marktpreis-Zusage
 
 Die Berechnung ist eine erste Orientierung und ersetzt keine standortbezogene Ertragssimulation, Dachprüfung, Netzprüfung oder ein verbindliches Angebot. Verschattung, genaue Dachgeometrie, Standort, Anlagenverluste, Wechselrichter, Speicherwirkungsgrad, Lastprofil, Alterung, Wartung, Finanzierung, Steuern und gesetzliche Änderungen werden nicht vollständig modelliert.
