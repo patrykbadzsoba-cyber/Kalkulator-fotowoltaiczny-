@@ -8,6 +8,26 @@ const locationStatus = el("location-status");
 const locationDetails = el("location-details");
 const searchButton = el("location-search-button");
 const locateButton = el("locate-button");
+const partnerCta = el("partner-cta");
+const partnerCtaTitle = el("partner-cta-title");
+const partnerCtaLink = el("partner-cta-link");
+
+// Partner mode: pass an HTTPS contact URL via ?kontakt= and an optional name via ?partner=.
+(function configurePartnerCta() {
+  const params = new URLSearchParams(window.location.search);
+  const contact = params.get("kontakt");
+  const partner = (params.get("partner") || "deinem Fachbetrieb").trim().slice(0, 80);
+  if (!contact) return;
+  try {
+    const url = new URL(contact);
+    if (url.protocol !== "https:" || url.username || url.password) return;
+    partnerCtaTitle.textContent = "Weiter zu " + partner;
+    partnerCtaLink.href = url.href;
+    partnerCta.hidden = false;
+  } catch (_) {
+    // Invalid partner URLs are ignored; the calculator remains usable.
+  }
+})();
 let selectedLocation = null;
 let localYieldPerKwp = 950;
 let locationRequest = 0;
