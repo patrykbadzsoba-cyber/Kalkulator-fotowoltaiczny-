@@ -33,6 +33,22 @@ Wichtig: GitHub Actions kann den Pages-Dienst nicht selbst aktivieren, wenn GitH
 
 Die Berechnung ist eine erste Orientierung und ersetzt keine standortbezogene Ertragssimulation, Dachprüfung, Netzprüfung oder ein verbindliches Angebot. Verschattung, genaue Dachgeometrie, Standort, Anlagenverluste, Wechselrichter, Speicherwirkungsgrad, Lastprofil, Alterung, Wartung, Finanzierung, Steuern und gesetzliche Änderungen werden nicht vollständig modelliert.
 
+## Partner-Modus für Installationsbetriebe
+
+Ein Installationsbetrieb kann den Rechner mit einem eigenen Kontaktziel verlinken. Beispiel (URL-Parameter müssen URL-kodiert werden):
+
+```text
+https://patrykbadzsoba-cyber.github.io/Kalkulator-fotowoltaiczny-/?partner=Seven%20Solar&kontakt=https%3A%2F%2Fseven-solar.de%2Fkontakt%2F
+```
+
+- Der CTA erscheint nur, wenn `kontakt` eine gültige HTTPS-Adresse enthält.
+- `partner` ist ein optionaler Anzeigename.
+- Der Rechner übermittelt keine Eingaben, Berechnungsergebnisse oder Kontaktdaten an uns oder den Partner.
+- Der CTA öffnet lediglich die Kontaktseite des Betriebs. Ein Interessent muss dort selbst aktiv eine Anfrage absenden.
+- Es gibt in dieser Version keine Lead-Zählung, kein Tracking und keine Conversion-Statistik.
+
+Für einen kommerziellen Einsatz muss der jeweilige Betreiber die eigene Einbindung, Markenkennzeichnung, Impressums- und Datenschutzpflichten prüfen. Die Modellwerte sind unverbindliche Schätzungen und kein technisches Angebot.
+
 ## Datenschutz und gewerblicher Einsatz
 
 Die Berechnung läuft vollständig im Browser. In dieser Version gibt es kein Konto, kein Tracking und keine Formularübermittlung. Damit werden auch keine Interessentenanfragen an einen Installationsbetrieb übertragen. Eine gewerbliche Veröffentlichung in Deutschland benötigt vor dem Livebetrieb außerdem ein korrektes Impressum und eine auf das tatsächliche Hosting und die eingesetzten Dienste abgestimmte Datenschutzerklärung. Diese Angaben müssen vom Betreiber ergänzt und rechtlich geprüft werden.
