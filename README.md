@@ -51,7 +51,7 @@ Die Software steht unter der MIT-Lizenz. Sie erlaubt auch die kostenlose kommerz
 
 ## Datenschutz und gewerblicher Einsatz
 
-Die Berechnung läuft vollständig im Browser. In dieser Version gibt es kein Konto, kein Tracking und keine Formularübermittlung. Damit werden auch keine Interessentenanfragen an einen Installationsbetrieb übertragen. Eine gewerbliche Veröffentlichung in Deutschland benötigt vor dem Livebetrieb außerdem ein korrektes Impressum und eine auf das tatsächliche Hosting und die eingesetzten Dienste abgestimmte Datenschutzerklärung. Diese Angaben müssen vom Betreiber ergänzt und rechtlich geprüft werden.
+Die Rechenlogik läuft im Browser. Es gibt kein Konto, keine Analyse-/Werbe-Tracker und keine Formularübermittlung. Für die Standortsuche und den standortbezogenen Ertragsrichtwert werden Suchbegriff bzw. Koordinaten an die Open-Meteo-Geocoding- und Wetter-APIs übertragen. Damit werden auch keine Interessentenanfragen an einen Installationsbetrieb übertragen. Eine gewerbliche Veröffentlichung in Deutschland benötigt vor dem Livebetrieb außerdem ein korrektes Impressum und eine auf das tatsächliche Hosting und die eingesetzten Dienste abgestimmte Datenschutzerklärung. Diese Angaben müssen vom Betreiber ergänzt und rechtlich geprüft werden.
 
 ## Lizenz
 
