@@ -25,10 +25,11 @@
 | Angebot | Vorgeschlagener Preis |
 |---|---:|
 | 14-tägiger Pilot | 0 € |
-| Basislizenz nach Pilot | 49 €/Monat |
-| Einrichtung / Anpassung des Kontakt-Links | im Pilot inklusive; weitere Anpassungen nach Aufwand |
+| Einrichtung / individuelle Konfiguration | 149 € einmalig |
+| Laufende Betreuung, Updates und Support | 49 €/Monat |
+| Zusätzliche Anpassungen | nach vorheriger Abstimmung und Aufwand |
 
-Dies sind zu testende Einstiegspreise, keine bereits validierten Marktpreise. Eine höhere Professional-Stufe wird erst angeboten, wenn zusätzliche Funktionen und ihr Nutzen nachgewiesen sind.
+Wichtig: Der bestehende Quellcode steht unter MIT-Lizenz und darf von Seven Solar auch kostenlos kommerziell genutzt und selbst gehostet werden. Die Preise oben beziehen sich ausschließlich auf optionale Dienstleistungen (Einrichtung, Konfiguration, laufende Betreuung und Support), nicht auf ein exklusives Nutzungsrecht am Code. Dies sind zu testende Einstiegspreise, keine bereits validierten Marktpreise.
 
 ## Nachricht auf Deutsch
 
@@ -40,7 +41,7 @@ ich habe gesehen, dass Seven Solar unabhängige Photovoltaikberatung in Hamburg 
 
 Der Rechner bietet eine erste Orientierung zu Anlagengröße, geschätztem Jahresertrag, Eigenverbrauch und Wirtschaftlichkeit. Nutzer können ihren Standort und ihre eigenen Annahmen eingeben. Die Berechnung läuft im Browser; Eingaben und Ergebnisse werden nicht an mich übertragen. Auf Wunsch führt ein Kontakt-Button direkt zu Ihrer Kontaktseite.
 
-Ich möchte Ihnen einen 14-tägigen, unverbindlichen Test anbieten. Wenn das Werkzeug für Ihre Erstberatung nützlich ist, können wir anschließend über eine einfache Lizenz ab 49 € pro Monat sprechen. Es gibt aktuell ausdrücklich kein Lead-Tracking und keine automatische Übermittlung von Anfragen.
+Ich möchte Ihnen einen 14-tägigen, unverbindlichen Test anbieten. Wenn das Werkzeug für Ihre Erstberatung nützlich ist, kann ich anschließend die individuelle Einrichtung für 149 € einmalig sowie laufende Betreuung, Updates und Support für 49 € pro Monat anbieten. Der Quellcode selbst steht unter MIT-Lizenz und kann von Ihnen auch kostenlos selbst betrieben werden. Es gibt aktuell ausdrücklich kein Lead-Tracking und keine automatische Übermittlung von Anfragen.
 
 **Demo:** [NACH ERFOLGREICHER VERÖFFENTLICHUNG HIER EINFÜGEN]
 
