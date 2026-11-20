@@ -47,7 +47,7 @@ https://patrykbadzsoba-cyber.github.io/Kalkulator-fotowoltaiczny-/?partner=Seven
 - Der CTA öffnet lediglich die Kontaktseite des Betriebs. Ein Interessent muss dort selbst aktiv eine Anfrage absenden.
 - Es gibt in dieser Version keine Lead-Zählung, kein Tracking und keine Conversion-Statistik.
 
-Für einen kommerziellen Einsatz muss der jeweilige Betreiber die eigene Einbindung, Markenkennzeichnung, Impressums- und Datenschutzpflichten prüfen. Die Modellwerte sind unverbindliche Schätzungen und kein technisches Angebot.
+Die Software steht unter der MIT-Lizenz. Sie erlaubt auch die kostenlose kommerzielle Nutzung, Veränderung und Weitergabe unter den Lizenzbedingungen. Eine exklusive oder kostenpflichtige Softwarelizenz für den bestehenden Code wird deshalb nicht verkauft. Ein kostenpflichtiges Angebot kann sich nur auf zusätzliche Dienstleistungen beziehen, z. B. Einrichtung, individuelle Anpassung, betreute Bereitstellung, Wartung und Support. Für den kommerziellen Einsatz muss der jeweilige Betreiber außerdem Einbindung, Markenkennzeichnung, Impressums- und Datenschutzpflichten prüfen. Die Modellwerte sind unverbindliche Schätzungen und kein technisches Angebot.
 
 ## Datenschutz und gewerblicher Einsatz
 
