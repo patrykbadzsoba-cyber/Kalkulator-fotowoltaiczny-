@@ -91,6 +91,8 @@ async function loadSolarEstimate(lat, lon, label) {
   locationStatus.textContent = "Standort erkannt. Lokale Sonneneinstrahlung wird geladen …";
   locationDetails.hidden = true;
   calculate();
+  // Auf Mobilgeräten das Ergebnis direkt nach der Standortwahl sichtbar machen.
+  resultsPanel.scrollIntoView({ behavior: "smooth", block: "start" });
   try {
     const start = "2021-01-01";
     const end = "2025-12-31";
