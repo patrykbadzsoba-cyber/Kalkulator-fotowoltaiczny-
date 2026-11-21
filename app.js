@@ -235,7 +235,7 @@ function exportResultsCsv() {
     ["Einfache Amortisationszeit", el("payback").textContent],
     ["Hinweis", "Modellrechnung, keine Ertragsgarantie und kein verbindliches Angebot."]
   ];
-  const csv = "\\uFEFF" + rows.map(row => row.map(csvCell).join(";")).join("\\r\\n");
+  const csv = "\uFEFF" + rows.map(row => row.map(csvCell).join(";")).join("\r\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
