@@ -4,7 +4,7 @@ const { DefaultArtifactClient } = require("@actions/artifact");
 async function main() {
   const artifactPath = path.join(process.env.RUNNER_TEMP || "", "artifact.tar");
   const client = new DefaultArtifactClient();
-  const result = await client.uploadArtifact("github-pages", [artifactPath], {
+  const result = await client.uploadArtifact("github-pages", [artifactPath], process.env.RUNNER_TEMP, {
     retentionDays: 1
   });
   if (!result || !result.id) {
