@@ -71,7 +71,8 @@ function calculate() {
   if (electricityPrice <= 0 || feedIn < 0 || battery < 0 || systemCost <= 0 || batteryCost < 0) return fail("Bitte prüfe Strompreis, Einspeisevergütung und Kostenangaben.");
 
   const maxRoofCapacity = roofArea / 4.5;
-  const requestedCapacity = consumption / 1000;
+  // Size the array against the estimated local annual yield, not a fixed 1,000 kWh/kWp assumption.
+  const requestedCapacity = consumption / Math.max(localYieldPerKwp * orientation * tilt, 1);
   const capacity = Math.min(maxRoofCapacity, requestedCapacity);
   const annualYield = capacity * localYieldPerKwp * orientation * tilt;
   const selfConsumptionShare = Math.min(0.78, 0.28 + (battery > 0 ? Math.min(0.42, battery / Math.max(consumption / 1000, 1) * 0.12) : 0));
@@ -206,4 +207,51 @@ locateButton.addEventListener("click", () => {
 form.addEventListener("input", calculate);
 form.addEventListener("change", calculate);
 form.addEventListener("reset", () => setTimeout(calculate, 0));
+
+function csvCell(value) {
+  return '"' + String(value ?? "").replace(/"/g, '""') + '"';
+}
+function exportResultsCsv() {
+  if (errorBox.hidden === false) {
+    errorBox.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+  const rows = [
+    ["PV-Rechner Deutschland – unverbindliche Schätzung"],
+    ["Standort", selectedLocation?.name || "Allgemeiner Richtwert"],
+    ["Ertragsannahme", localYieldPerKwp + " kWh/kWp/Jahr"],
+    ["Jährlicher Stromverbrauch (kWh)", el("consumption").value],
+    ["Nutzbare Dachfläche (m²)", el("roof-area").value],
+    ["Dachausrichtung", el("orientation").selectedOptions[0].text],
+    ["Dachneigung", el("tilt").selectedOptions[0].text],
+    ["Strompreis (EUR/kWh)", el("electricity-price").value],
+    ["Einspeisevergütung (EUR/kWh)", el("feed-in").value],
+    ["Speicher (kWh)", el("battery").value],
+    ["Anlagengröße (kWp)", el("system-size").textContent],
+    ["Jahresertrag (kWh)", el("yield").textContent],
+    ["Eigenverbrauch (kWh)", el("self-use").textContent],
+    ["Jährlicher finanzieller Nutzen (EUR)", el("savings").textContent],
+    ["Geschätzte Investition", el("investment").textContent],
+    ["Einfache Amortisationszeit", el("payback").textContent],
+    ["Hinweis", "Modellrechnung, keine Ertragsgarantie und kein verbindliches Angebot."]
+  ];
+  const csv = "\\uFEFF" + rows.map(row => row.map(csvCell).join(";")).join("\\r\\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "pv-berechnung.csv";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+el("print-report").addEventListener("click", () => {
+  if (!errorBox.hidden) {
+    errorBox.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+  window.print();
+});
+el("export-csv").addEventListener("click", exportResultsCsv);
 calculate();
