@@ -174,13 +174,20 @@ async function loadSolarEstimate(lat, lon, label) {
       if (!Number.isFinite(value) || value < 0) return;
       const year = date.slice(0, 4);
       const month = Number(date.slice(5, 7)) - 1;
-      if (!years[year]) years[year] = { totalMj: 0, days: 0, monthlyMj: Array(12).fill(0) };
+      if (!years[year]) years[year] = { totalMj: 0, days: 0, monthlyMj: Array(12).fill(0), monthlyDays: Array(12).fill(0) };
       years[year].totalMj += value;
       years[year].monthlyMj[month] += value;
+      years[year].monthlyDays[month] += 1;
       years[year].days += 1;
     });
-    // Ignore incomplete calendar years: averaging partial years as full years understates yield.
-    const completeYears = Object.values(years).filter(year => year.days >= 300);
+    // Require at least 75% daily coverage in every month; a yearly total alone
+    // can hide a missing month and produce a misleading seasonal distribution.
+    const completeYears = Object.entries(years).filter(([yearLabel, year]) =>
+      year.days >= 300 && year.monthlyDays.every((count, month) => {
+        const expectedDays = new Date(Number(yearLabel), month + 1, 0).getDate();
+        return count >= Math.ceil(expectedDays * 0.75);
+      })
+    ).map(([, year]) => year);
     if (completeYears.length < 3) {
       throw new Error("Es liegen weniger als drei vollständige Jahre mit ausreichenden Strahlungsdaten vor.");
     }
