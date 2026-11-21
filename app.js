@@ -32,6 +32,9 @@ const partnerCtaLink = el("partner-cta-link");
 })();
 let selectedLocation = null;
 let localYieldPerKwp = 950;
+let pvgisMonthlyPerKwp = null;
+let pvgisActive = false;
+let pvgisRequest = 0;
 let locationRequest = 0;
 
 function clearResults() {
@@ -47,6 +50,67 @@ function fail(message) {
   resultsPanel.classList.add("has-error");
   clearResults();
 }
+function renderMonthlyProduction(capacity, shading) {
+  const panel = el("monthly-production");
+  const body = el("monthly-production-body");
+  if (!panel || !body) return;
+  body.replaceChildren();
+  if (!pvgisActive || !Array.isArray(pvgisMonthlyPerKwp) || pvgisMonthlyPerKwp.length !== 12) {
+    panel.hidden = true;
+    return;
+  }
+  const months = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+  pvgisMonthlyPerKwp.forEach((value, index) => {
+    const row = document.createElement("tr");
+    const month = document.createElement("th");
+    const amount = document.createElement("td");
+    month.scope = "row";
+    month.textContent = months[index];
+    amount.textContent = number.format(value * capacity * shading) + " kWh";
+    row.append(month, amount);
+    body.append(row);
+  });
+  panel.hidden = false;
+}
+
+async function loadPvgisEstimate(lat, lon) {
+  const requestId = ++pvgisRequest;
+  pvgisActive = false;
+  pvgisMonthlyPerKwp = null;
+  if (!selectedLocation) return;
+  const angle = Number(el("tilt").selectedOptions[0].dataset.angle || 30);
+  const aspect = Number(el("orientation").selectedOptions[0].dataset.aspect || 0);
+  const params = new URLSearchParams({
+    lat: String(lat), lon: String(lon), peakpower: "1", loss: "14",
+    angle: String(angle), aspect: String(aspect), outputformat: "json", usehorizon: "1"
+  });
+  locationStatus.textContent = "PVGIS-Solardaten werden geladen …";
+  try {
+    const response = await fetch("https://re.jrc.ec.europa.eu/api/v5_3/PVcalc?" + params.toString());
+    if (!response.ok) throw new Error("PVGIS antwortet mit HTTP " + response.status);
+    const data = await response.json();
+    if (requestId !== pvgisRequest) return;
+    const annual = Number(data.outputs?.totals?.fixed?.E_y);
+    const monthly = data.outputs?.monthly?.fixed;
+    if (!Number.isFinite(annual) || annual <= 0 || !Array.isArray(monthly) || monthly.length !== 12) {
+      throw new Error("Die PVGIS-Antwort enthält keine vollständigen Jahres- und Monatswerte.");
+    }
+    const values = monthly.map(item => Number(item.E_m));
+    if (values.some(value => !Number.isFinite(value) || value < 0)) throw new Error("PVGIS lieferte ungültige Monatswerte.");
+    localYieldPerKwp = annual;
+    pvgisMonthlyPerKwp = values;
+    pvgisActive = true;
+    locationStatus.textContent = "PVGIS-Daten geladen · Europäische Kommission/JRC · PVGIS 5.3 · Systemverluste 14 %.";
+    locationDetails.textContent = selectedLocation.name + " · PVGIS-Jahresertrag: " + number.format(annual) + " kWh/kWp · Neigung " + angle + "° · Azimut " + aspect + "°.";
+  } catch (error) {
+    if (requestId !== pvgisRequest) return;
+    locationStatus.textContent = "PVGIS ist nicht erreichbar oder lieferte unvollständige Daten. Es bleibt die ausdrücklich vereinfachte Open-Meteo-Schätzung.";
+    pvgisActive = false;
+    pvgisMonthlyPerKwp = null;
+  }
+  calculate();
+}
+
 function calculate() {
   errorBox.hidden = true;
   resultsPanel.classList.remove("has-error");
@@ -74,10 +138,11 @@ function calculate() {
   if (electricityPrice <= 0 || feedIn < 0 || battery < 0 || systemCost <= 0 || batteryCost < 0) return fail("Bitte prüfe Strompreis, Einspeisevergütung und Kostenangaben.");
 
   const maxRoofCapacity = roofArea / 4.5;
-  // Size the array against the estimated local annual yield, not a fixed 1,000 kWh/kWp assumption.
-  const requestedCapacity = consumption / Math.max(localYieldPerKwp * orientation * tilt * shading, 1);
+  // PVGIS already models roof orientation and inclination; apply those factors only to the fallback estimate.
+  const yieldFactor = pvgisActive ? shading : orientation * tilt * shading;
+  const requestedCapacity = consumption / Math.max(localYieldPerKwp * yieldFactor, 1);
   const capacity = Math.min(maxRoofCapacity, requestedCapacity);
-  const annualYield = capacity * localYieldPerKwp * orientation * tilt * shading;
+  const annualYield = capacity * localYieldPerKwp * yieldFactor;
   const selfConsumptionShare = Math.min(0.78, 0.28 + (battery > 0 ? Math.min(0.42, battery / Math.max(consumption / 1000, 1) * 0.12) : 0));
   const selfConsumed = Math.min(consumption, annualYield * selfConsumptionShare);
   const exported = Math.max(0, annualYield - selfConsumed);
@@ -99,6 +164,7 @@ function calculate() {
   el("payback").textContent = Number.isFinite(payback) ? payback.toLocaleString("de-DE", {maximumFractionDigits: 1}) + " Jahre" : "–";
   el("investment").textContent = "Investition ca. " + euro.format(investment);
   el("coverage").textContent = gridCoverage.toLocaleString("de-DE", {maximumFractionDigits: 0}) + " % deines Jahresverbrauchs";
+  renderMonthlyProduction(capacity, shading);
   const ownShareOfProduction = annualYield > 0 ? selfConsumed / annualYield * 100 : 0;
   el("used-bar").style.width = ownShareOfProduction + "%";
   el("export-bar").style.width = (100 - ownShareOfProduction) + "%";
@@ -162,6 +228,7 @@ async function loadSolarEstimate(lat, lon, label) {
     locationDetails.textContent = label + " · " + Number(lat).toFixed(4) + "°, " + Number(lon).toFixed(4) + "° · 950 kWh/kWp/Jahr (allgemeiner Richtwert).";
     locationDetails.hidden = false;
   }
+  await loadPvgisEstimate(lat, lon);
   calculate();
 }
 async function searchLocation() {
@@ -222,6 +289,8 @@ locateButton.addEventListener("click", () => {
 form.addEventListener("input", calculate);
 form.addEventListener("change", calculate);
 form.addEventListener("reset", () => setTimeout(calculate, 0));
+el("orientation").addEventListener("change", () => { if (selectedLocation) loadPvgisEstimate(selectedLocation.lat, selectedLocation.lon); });
+el("tilt").addEventListener("change", () => { if (selectedLocation) loadPvgisEstimate(selectedLocation.lat, selectedLocation.lon); });
 
 function csvCell(value) {
   return '"' + String(value ?? "").replace(/"/g, '""') + '"';
@@ -253,6 +322,13 @@ function exportResultsCsv() {
     ["Einfache Amortisationszeit", el("payback").textContent],
     ["Hinweis", "Modellrechnung, keine Ertragsgarantie und kein verbindliches Angebot."]
   ];
+  if (pvgisActive && pvgisMonthlyPerKwp) {
+    rows.push(["Quelle Monatsproduktion", "PVGIS 5.3 · JRC Europäische Kommission"]);
+    rows.push(["Monat", "PV-Produktion (kWh)"]);
+    const capacity = Number(String(el("system-size").textContent).replace(",", ".").match(/[0-9.]+/)?.[0] || 0);
+    const shading = Number(el("shading").value);
+    ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"].forEach((month, index) => rows.push([month, Math.round(pvgisMonthlyPerKwp[index] * capacity * shading)]));
+  }
   const csv = "\uFEFF" + rows.map(row => row.map(csvCell).join(";")).join("\r\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
