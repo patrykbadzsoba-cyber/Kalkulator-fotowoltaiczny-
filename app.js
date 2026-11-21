@@ -428,13 +428,37 @@ function initLocationMap() {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(locationMap);
-  locationMap.on("click", event => {
+  let reverseLookupInProgress = false;
+  locationMap.on("click", async event => {
     const { lat, lng } = event.latlng;
     if (lat < 47.27 || lat > 55.06 || lng < 5.87 || lng > 15.04) {
       mapStatus.textContent = "Bitte wähle einen Standort innerhalb Deutschlands.";
       return;
     }
-    loadSolarEstimate(lat, lng, "Manuell gewählter Kartenpunkt");
+    if (reverseLookupInProgress) return;
+    reverseLookupInProgress = true;
+    mapStatus.textContent = "Adresse des ausgewählten Kartenpunkts wird ermittelt …";
+    let label = "Kartenpunkt " + lat.toFixed(5) + ", " + lng.toFixed(5);
+    try {
+      const reverseUrl = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat="
+        + encodeURIComponent(lat) + "&lon=" + encodeURIComponent(lng)
+        + "&zoom=18&addressdetails=1";
+      const response = await fetch(reverseUrl, { headers: { "Accept": "application/json" } });
+      if (!response.ok) throw new Error("Reverse-Geocoding nicht verfügbar");
+      const data = await response.json();
+      if (data.address) {
+        const a = data.address;
+        const street = [a.road, a.house_number].filter(Boolean).join(" ");
+        label = [street, a.postcode, a.city || a.town || a.village || a.municipality, a.state]
+          .filter(Boolean).join(", ") || data.display_name || label;
+      }
+    } catch (_) {
+      // Coordinate-based selection remains usable if address lookup is unavailable.
+    } finally {
+      reverseLookupInProgress = false;
+    }
+    mapStatus.textContent = "Ausgewählter Standort: " + label + ". Dachfläche und Dachmerkmale bitte prüfen.";
+    await loadSolarEstimate(lat, lng, label);
   });
   mapStatus.textContent = "Karte bereit. Wähle einen Punkt auf der Karte oder suche oben nach Stadt oder Postleitzahl.";
 }
