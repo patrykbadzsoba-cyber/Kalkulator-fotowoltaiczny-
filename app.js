@@ -32,6 +32,7 @@ const partnerCtaLink = el("partner-cta-link");
 })();
 let selectedLocation = null;
 let localYieldPerKwp = 950;
+window.PVAppLocalYield = localYieldPerKwp;
 let monthlyRadiationProfile = null;
 let locationRequest = 0;
 let locationMap = null;
@@ -157,6 +158,7 @@ async function loadSolarEstimate(lat, lon, label) {
   }
   findNearbyBuildings(lat, lon);
   localYieldPerKwp = 950;
+  window.PVAppLocalYield = localYieldPerKwp;
   locationStatus.textContent = "Standort erkannt. Lokale Sonneneinstrahlung wird geladen …";
   locationDetails.hidden = true;
   calculate();
@@ -212,12 +214,15 @@ async function loadSolarEstimate(lat, lon, label) {
       }, 0) / completeYears.length
     );
     localYieldPerKwp = Math.max(650, Math.min(1250, avgAnnualKwhM2 * 0.80));
+    window.PVAppLocalYield = localYieldPerKwp;
     locationStatus.textContent = "Standort und lokale Klimadaten geladen. Verwendet werden " + completeYears.length + " vollständige Kalenderjahre aus dem Zeitraum 2021–2025.";
     locationDetails.textContent = label + " · " + Math.abs(Number(lat)).toFixed(4) + "° " + (lat >= 0 ? "N" : "S") + ", " + Math.abs(Number(lon)).toFixed(4) + "° " + (lon >= 0 ? "E" : "W") + " · geschätzter Ertrag: " + number.format(localYieldPerKwp) + " kWh/kWp/Jahr.";
     locationDetails.hidden = false;
   } catch (error) {
     if (requestId !== locationRequest) return;
     monthlyRadiationProfile = null;
+    localYieldPerKwp = 950;
+    window.PVAppLocalYield = localYieldPerKwp;
     locationStatus.textContent = "Standort gespeichert, aber lokale Klimadaten sind gerade nicht erreichbar. Es wird vorläufig der allgemeine Richtwert verwendet.";
     locationDetails.textContent = label + " · " + Number(lat).toFixed(4) + "°, " + Number(lon).toFixed(4) + "° · 950 kWh/kWp/Jahr (allgemeiner Richtwert).";
     locationDetails.hidden = false;
