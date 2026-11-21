@@ -105,3 +105,20 @@ footer{border-top-color:#3b5574;color:#a9bad0}
 .methodology-box strong{display:block;margin-bottom:7px;color:#d2c5ff;font:700 13px Manrope,sans-serif}
 .methodology-box p{margin:7px 0 0;color:#c4d0df;font-size:11px;line-height:1.7}
 @media print{.methodology-box{background:#fff!important;border:1px solid #999}.methodology-box strong,.methodology-box p{color:#222!important}}
+
+.quantum-panel{margin:22px 0;padding:18px;border:1px solid #35e0d077;border-radius:13px;background:linear-gradient(135deg,#102b3b,#211d43 75%,#18233e);box-shadow:inset 0 0 35px #35e0d00b}
+.quantum-kicker{font-size:9px;letter-spacing:.17em;font-weight:800;color:#35e0d0}
+.quantum-heading h4{font:800 19px Manrope,sans-serif;margin:4px 0;color:#f7fbff}
+.quantum-heading p,.quantum-status{font-size:11px;line-height:1.6;color:#b4c4d8;margin:5px 0 12px}
+.quantum-button{width:100%;min-height:43px;border:0;border-radius:8px;background:linear-gradient(100deg,#35e0d0,#a78bfa);color:#101820;font:800 12px 'DM Sans',sans-serif;cursor:pointer}
+.quantum-button:disabled{opacity:.55;cursor:wait}
+.quantum-output{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+.quantum-output[hidden]{display:none}
+.quantum-output>div{padding:11px;border:1px solid #53617e;border-radius:8px;background:#ffffff08}
+.quantum-output span,.quantum-output small{display:block;font-size:10px;color:#b4c4d8}
+.quantum-output strong{display:block;margin-top:5px;font:700 18px Manrope,sans-serif;color:#c8ff3d;overflow-wrap:anywhere}
+.quantum-output>p{grid-column:1/-1;margin:3px 0 0;color:#35e0d0;font-size:11px;font-weight:700}
+.quantum-output>small{grid-column:1/-1;line-height:1.5}
+.quantum-note{margin:13px 0 0;color:#91a5bd;font-size:10px;line-height:1.6}
+@media(max-width:540px){.quantum-panel{padding:14px}.quantum-output{gap:7px}.quantum-output>div{padding:9px}.quantum-output strong{font-size:16px}}
+@media print{.quantum-panel{background:#fff!important;border:1px solid #999;box-shadow:none}.quantum-heading h4,.quantum-heading p,.quantum-status,.quantum-output span,.quantum-output strong,.quantum-output>p,.quantum-output small,.quantum-note{color:#222!important}.quantum-button{display:none}}
