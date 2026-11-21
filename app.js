@@ -73,21 +73,15 @@ function calculate() {
   if (consumption <= 0 || roofArea <= 0) return fail("Stromverbrauch und nutzbare Dachfläche müssen größer als 0 sein.");
   if (electricityPrice <= 0 || feedIn < 0 || battery < 0 || systemCost <= 0 || batteryCost < 0) return fail("Bitte prüfe Strompreis, Einspeisevergütung und Kostenangaben.");
 
-  const maxRoofCapacity = roofArea / 4.5;
-  // Size the array against the estimated local annual yield, not a fixed 1,000 kWh/kWp assumption.
-  const requestedCapacity = consumption / Math.max(localYieldPerKwp * orientation * tilt * shading, 1);
-  const capacity = Math.min(maxRoofCapacity, requestedCapacity);
-  const annualYield = capacity * localYieldPerKwp * orientation * tilt * shading;
-  const selfConsumptionShare = Math.min(0.78, 0.28 + (battery > 0 ? Math.min(0.42, battery / Math.max(consumption / 1000, 1) * 0.12) : 0));
-  const selfConsumed = Math.min(consumption, annualYield * selfConsumptionShare);
-  const exported = Math.max(0, annualYield - selfConsumed);
-  const gridCoverage = Math.min(100, selfConsumed / consumption * 100);
-  const selfConsumptionSavings = selfConsumed * electricityPrice;
-  const feedInRevenue = exported * feedIn;
-  const annualSavings = selfConsumptionSavings + feedInRevenue;
-  const investment = capacity * systemCost + battery * batteryCost;
-  const payback = annualSavings > 0 ? investment / annualSavings : Infinity;
-  const panels = Math.round(capacity * 1000 / 430);
+  const estimate = window.PVModel.estimate({
+    consumption, roofArea, orientation, tilt, shading, electricityPrice,
+    feedIn, battery, systemCost, batteryCost, localYieldPerKwp
+  });
+  const {
+    maxRoofCapacity, requestedCapacity, capacity, annualYield, selfConsumed,
+    exported, gridCoverage, selfConsumptionSavings, feedInRevenue,
+    annualSavings, investment, payback, panels
+  } = estimate;
 
   el("system-size").innerHTML = capacity.toLocaleString("de-DE", {maximumFractionDigits: 2}) + ' <small>kWp</small>';
   el("panel-count").textContent = "Ungefähr " + number.format(panels) + " Module à 430 Wp · Dachmaximum " + maxRoofCapacity.toLocaleString("de-DE", {maximumFractionDigits: 2}) + " kWp";
@@ -99,7 +93,7 @@ function calculate() {
   el("payback").textContent = Number.isFinite(payback) ? payback.toLocaleString("de-DE", {maximumFractionDigits: 1}) + " Jahre" : "–";
   el("investment").textContent = "Investition ca. " + euro.format(investment);
   el("coverage").textContent = gridCoverage.toLocaleString("de-DE", {maximumFractionDigits: 0}) + " % deines Jahresverbrauchs";
-  const ownShareOfProduction = annualYield > 0 ? selfConsumed / annualYield * 100 : 0;
+  const ownShareOfProduction = estimate.ownShareOfProduction;
   el("used-bar").style.width = ownShareOfProduction + "%";
   el("export-bar").style.width = (100 - ownShareOfProduction) + "%";
   const roofLimited = maxRoofCapacity < requestedCapacity;
