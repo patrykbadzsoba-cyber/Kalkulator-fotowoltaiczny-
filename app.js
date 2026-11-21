@@ -64,6 +64,7 @@ function calculate() {
   const roofArea = Number(el("roof-area").value);
   const orientation = Number(el("orientation").value);
   const tilt = Number(el("tilt").value);
+  const shading = Number(el("shading").value);
   const electricityPrice = Number(el("electricity-price").value);
   const feedIn = Number(el("feed-in").value);
   const battery = Number(el("battery").value);
@@ -74,9 +75,9 @@ function calculate() {
 
   const maxRoofCapacity = roofArea / 4.5;
   // Size the array against the estimated local annual yield, not a fixed 1,000 kWh/kWp assumption.
-  const requestedCapacity = consumption / Math.max(localYieldPerKwp * orientation * tilt, 1);
+  const requestedCapacity = consumption / Math.max(localYieldPerKwp * orientation * tilt * shading, 1);
   const capacity = Math.min(maxRoofCapacity, requestedCapacity);
-  const annualYield = capacity * localYieldPerKwp * orientation * tilt;
+  const annualYield = capacity * localYieldPerKwp * orientation * tilt * shading;
   const selfConsumptionShare = Math.min(0.78, 0.28 + (battery > 0 ? Math.min(0.42, battery / Math.max(consumption / 1000, 1) * 0.12) : 0));
   const selfConsumed = Math.min(consumption, annualYield * selfConsumptionShare);
   const exported = Math.max(0, annualYield - selfConsumed);
@@ -102,7 +103,7 @@ function calculate() {
   el("summary").textContent = (roofLimited
     ? "Achtung: Die Dachfläche begrenzt die Anlage. Für " + requestedCapacity.toLocaleString("de-DE", {maximumFractionDigits: 1}) + " kWp wären ungefähr " + (requestedCapacity * 4.5).toLocaleString("de-DE", {maximumFractionDigits: 0}) + " m² nutzbare Fläche nötig. "
     : "Die Dachfläche bietet rechnerisch Platz für die angesetzte Anlagengröße. ")
-    + "Mit den eingegebenen Annahmen könnten etwa " + euro.format(annualSavings)
+    + "Berücksichtigte Verschattung: " + Math.round((1 - shading) * 100) + " %. Mit den eingegebenen Annahmen könnten etwa " + euro.format(annualSavings)
     + " Stromkostenersparnis und Einspeiseerlöse pro Jahr entstehen. Der Eigenverbrauch deckt rechnerisch rund "
     + gridCoverage.toLocaleString("de-DE", {maximumFractionDigits: 0}) + " % deines Jahresbedarfs."
     + (selectedLocation ? " Standort: " + selectedLocation.name + ". Lokaler Ertragsrichtwert: " + number.format(localYieldPerKwp) + " kWh/kWp/Jahr." : " Es wird ein allgemeiner Richtwert von 950 kWh/kWp/Jahr verwendet.");
@@ -227,6 +228,7 @@ function exportResultsCsv() {
     ["Nutzbare Dachfläche (m²)", el("roof-area").value],
     ["Dachausrichtung", el("orientation").selectedOptions[0].text],
     ["Dachneigung", el("tilt").selectedOptions[0].text],
+    ["Verschattung (Modellannahme)", el("shading").selectedOptions[0].text],
     ["Strompreis (EUR/kWh)", el("electricity-price").value],
     ["Einspeisevergütung (EUR/kWh)", el("feed-in").value],
     ["Speicher (kWh)", el("battery").value],
