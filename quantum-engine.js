@@ -96,7 +96,7 @@
       const current = window.PVModel.estimate(base);
       const gain = optimized.result.annualSavings - current.annualSavings;
       output.hidden = false;
-      $("quantum-size").textContent = number.format(optimized.kw) + " kWp";
+      $("quantum-size").textContent = number.format(optimized.result.capacity) + " kWp";
       $("quantum-battery").textContent = number.format(optimized.battery) + " kWh";
       $("quantum-benefit").textContent = euro.format(optimized.result.annualSavings) + "/Jahr";
       $("quantum-payback").textContent = Number.isFinite(optimized.result.payback) ? number.format(optimized.result.payback) + " Jahre" : "nicht berechenbar";
