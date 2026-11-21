@@ -54,3 +54,27 @@ test("rejects non-finite and physically invalid inputs", () => {
   assert.throws(() => estimate({ ...defaults, roofArea: 0 }), RangeError);
   assert.throws(() => estimate({ ...defaults, localYieldPerKwp: -1 }), RangeError);
 });
+
+
+test("distributes annual yield across 12 months using the measured radiation profile", () => {
+  const { distributeMonthlyYield } = require("../pv-model.js");
+  const monthly = distributeMonthlyYield(Array(12).fill(1), 1200);
+  assert.equal(monthly.length, 12);
+  assert.ok(monthly.every(value => Math.abs(value - 100) < 1e-9));
+  assert.ok(Math.abs(monthly.reduce((sum, value) => sum + value, 0) - 1200) < 1e-8);
+});
+
+test("preserves the seasonal shape of monthly solar radiation", () => {
+  const { distributeMonthlyYield } = require("../pv-model.js");
+  const monthly = distributeMonthlyYield([1, 1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 1], 3200);
+  assert.ok(monthly[5] > monthly[0]);
+  assert.ok(monthly[6] > monthly[11]);
+  assert.ok(Math.abs(monthly.reduce((sum, value) => sum + value, 0) - 3200) < 1e-8);
+});
+
+test("rejects incomplete or invalid monthly radiation profiles", () => {
+  const { distributeMonthlyYield } = require("../pv-model.js");
+  assert.throws(() => distributeMonthlyYield([1, 2], 1000), TypeError);
+  assert.throws(() => distributeMonthlyYield(Array(12).fill(-1), 1000), TypeError);
+  assert.throws(() => distributeMonthlyYield(Array(12).fill(0), 1000), RangeError);
+});

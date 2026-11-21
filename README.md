@@ -16,7 +16,7 @@ Wichtig: GitHub Actions kann den Pages-Dienst nicht selbst aktivieren, wenn GitH
 
 - Schätzung der PV-Leistung anhand von Jahresverbrauch und nutzbarer Dachfläche
 - Berücksichtigung von Dachausrichtung und Dachneigung über vereinfachte Planungsfaktoren
-- Modellierter Jahresertrag, Eigenverbrauch und Netzeinspeisung
+- Modellierter Jahresertrag, saisonale Monatsverteilung aus historischen Open-Meteo-Strahlungsdaten, Eigenverbrauch und Netzeinspeisung
 - Individuell einstellbarer Strompreis und Einspeisevergütung
 - Optionale Batteriespeicher-Kapazität
 - Geschätzte Investition, jährlicher finanzieller Nutzen und einfache Amortisationszeit
@@ -34,7 +34,7 @@ Wichtig: GitHub Actions kann den Pages-Dienst nicht selbst aktivieren, wenn GitH
 - Zahlen- und Währungsformat nach deutschem Gebietsschema
 - Anlagen- und Speicherpreise sind frei änderbare Beispielwerte, keine Marktpreis-Zusage
 
-Die Berechnung ist eine erste Orientierung und ersetzt keine standortbezogene Ertragssimulation, Dachprüfung, Netzprüfung oder ein verbindliches Angebot. Verschattung, genaue Dachgeometrie, Standort, Anlagenverluste, Wechselrichter, Speicherwirkungsgrad, Lastprofil, Alterung, Wartung, Finanzierung, Steuern und gesetzliche Änderungen werden nicht vollständig modelliert.
+Die Monatsverteilung wird nur angezeigt, wenn ausreichend historische tägliche Strahlungsdaten für mindestens drei vollständige Kalenderjahre geladen werden konnten. Sie verteilt den geschätzten Jahresertrag proportional zur mittleren monatlichen Globalstrahlung; sie ist keine separate PVGIS-Simulation. Die Berechnung ist eine erste Orientierung und ersetzt keine standortbezogene Ertragssimulation, Dachprüfung, Netzprüfung oder ein verbindliches Angebot. Verschattung, genaue Dachgeometrie, Standort, Anlagenverluste, Wechselrichter, Speicherwirkungsgrad, Lastprofil, Alterung, Wartung, Finanzierung, Steuern und gesetzliche Änderungen werden nicht vollständig modelliert.
 
 ## Partner-Modus für Installationsbetriebe
 
