@@ -24,7 +24,7 @@
   // quantum-inspired classical heuristic, not execution on quantum hardware.
   function optimize(base) {
     const maxKw = Math.max(0.5, Math.min(roofKw(base.roofArea), 30));
-    const maxBattery = Math.max(0, Math.min(20, base.battery, base.consumption / 500));
+    const maxBattery = Math.max(0, Math.min(20, base.consumption / 500));
     const kwSteps = Math.max(1, Math.floor(maxKw * 2));
     const batterySteps = Math.max(0, Math.floor(maxBattery * 2));
     const bits = Math.ceil(Math.log2(kwSteps + 1)) + Math.ceil(Math.log2(batterySteps + 1));
