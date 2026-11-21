@@ -32,7 +32,9 @@ const partnerCtaLink = el("partner-cta-link");
 })();
 let selectedLocation = null;
 let localYieldPerKwp = 950;
+let monthlyRadiationProfile = null;
 let locationRequest = 0;
+const monthLabels = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
 
 function clearResults() {
   ["system-size","panel-count","yield","self-use","self-use-detail","savings","savings-detail","payback","investment","coverage","summary"].forEach((id) => {
@@ -40,6 +42,8 @@ function clearResults() {
   });
   el("used-bar").style.width = "0%";
   el("export-bar").style.width = "0%";
+  el("monthly-yield").replaceChildren();
+  el("monthly-status").textContent = "Noch kein monatliches Strahlungsprofil verfügbar.";
 }
 function fail(message) {
   errorBox.textContent = message;
@@ -93,6 +97,7 @@ function calculate() {
   el("payback").textContent = Number.isFinite(payback) ? payback.toLocaleString("de-DE", {maximumFractionDigits: 1}) + " Jahre" : "–";
   el("investment").textContent = "Investition ca. " + euro.format(investment);
   el("coverage").textContent = gridCoverage.toLocaleString("de-DE", {maximumFractionDigits: 0}) + " % deines Jahresverbrauchs";
+  renderMonthlyProduction(annualYield);
   const ownShareOfProduction = estimate.ownShareOfProduction;
   el("used-bar").style.width = ownShareOfProduction + "%";
   el("export-bar").style.width = (100 - ownShareOfProduction) + "%";
@@ -105,8 +110,40 @@ function calculate() {
     + gridCoverage.toLocaleString("de-DE", {maximumFractionDigits: 0}) + " % deines Jahresbedarfs."
     + (selectedLocation ? " Standort: " + selectedLocation.name + ". Lokaler Ertragsrichtwert: " + number.format(localYieldPerKwp) + " kWh/kWp/Jahr." : " Es wird ein allgemeiner Richtwert von 950 kWh/kWp/Jahr verwendet.");
 }
+function renderMonthlyProduction(annualYield) {
+  const container = el("monthly-yield");
+  container.replaceChildren();
+  if (!monthlyRadiationProfile) {
+    el("monthly-status").textContent = "Monatswerte nicht verfügbar. Es wird kein monatliches Profil erfunden.";
+    return;
+  }
+  const monthly = window.PVModel.distributeMonthlyYield(monthlyRadiationProfile, annualYield);
+  const maximum = Math.max(...monthly, 1);
+  monthly.forEach((value, index) => {
+    const item = document.createElement("div");
+    item.className = "month-column";
+    const amount = document.createElement("span");
+    amount.className = "month-value";
+    amount.textContent = number.format(value);
+    const track = document.createElement("div");
+    track.className = "month-track";
+    const bar = document.createElement("span");
+    bar.className = "month-bar";
+    bar.style.height = Math.max(2, value / maximum * 100) + "%";
+    bar.setAttribute("aria-hidden", "true");
+    track.append(bar);
+    const label = document.createElement("span");
+    label.className = "month-label";
+    label.textContent = monthLabels[index];
+    item.append(amount, track, label);
+    container.append(item);
+  });
+  el("monthly-status").textContent = "Verteilung aus historischen täglichen Globalstrahlungsdaten von Open-Meteo (2021–2025), gemittelt über vollständige Jahre und auf den geschätzten Jahresertrag skaliert. Kein PVGIS-Ergebnis und keine Ertragsgarantie.";
+}
+
 async function loadSolarEstimate(lat, lon, label) {
   const requestId = ++locationRequest;
+  monthlyRadiationProfile = null;
   selectedLocation = { lat, lon, name: label };
   findNearbyBuildings(lat, lon);
   localYieldPerKwp = 950;
@@ -134,10 +171,12 @@ async function loadSolarEstimate(lat, lon, label) {
     const years = {};
     dates.forEach((date, i) => {
       const value = radiation[i];
-      if (!Number.isFinite(value)) return;
+      if (!Number.isFinite(value) || value < 0) return;
       const year = date.slice(0, 4);
-      if (!years[year]) years[year] = { totalMj: 0, days: 0 };
+      const month = Number(date.slice(5, 7)) - 1;
+      if (!years[year]) years[year] = { totalMj: 0, days: 0, monthlyMj: Array(12).fill(0) };
       years[year].totalMj += value;
+      years[year].monthlyMj[month] += value;
       years[year].days += 1;
     });
     // Ignore incomplete calendar years: averaging partial years as full years understates yield.
@@ -146,12 +185,16 @@ async function loadSolarEstimate(lat, lon, label) {
       throw new Error("Es liegen weniger als drei vollständige Jahre mit ausreichenden Strahlungsdaten vor.");
     }
     const avgAnnualKwhM2 = completeYears.reduce((sum, year) => sum + year.totalMj, 0) / completeYears.length / 3.6;
+    monthlyRadiationProfile = Array.from({length: 12}, (_, month) =>
+      completeYears.reduce((sum, year) => sum + year.monthlyMj[month], 0) / completeYears.length
+    );
     localYieldPerKwp = Math.max(650, Math.min(1250, avgAnnualKwhM2 * 0.80));
     locationStatus.textContent = "Standort und lokale Klimadaten geladen. Verwendet werden " + completeYears.length + " vollständige Kalenderjahre aus dem Zeitraum 2021–2025.";
     locationDetails.textContent = label + " · " + Math.abs(Number(lat)).toFixed(4) + "° " + (lat >= 0 ? "N" : "S") + ", " + Math.abs(Number(lon)).toFixed(4) + "° " + (lon >= 0 ? "E" : "W") + " · geschätzter Ertrag: " + number.format(localYieldPerKwp) + " kWh/kWp/Jahr.";
     locationDetails.hidden = false;
   } catch (error) {
     if (requestId !== locationRequest) return;
+    monthlyRadiationProfile = null;
     locationStatus.textContent = "Standort gespeichert, aber lokale Klimadaten sind gerade nicht erreichbar. Es wird vorläufig der allgemeine Richtwert verwendet.";
     locationDetails.textContent = label + " · " + Number(lat).toFixed(4) + "°, " + Number(lon).toFixed(4) + "° · 950 kWh/kWp/Jahr (allgemeiner Richtwert).";
     locationDetails.hidden = false;
@@ -239,6 +282,9 @@ function exportResultsCsv() {
     ["Speicher (kWh)", el("battery").value],
     ["Anlagengröße (kWp)", el("system-size").textContent],
     ["Jahresertrag (kWh)", el("yield").textContent],
+    ...((monthlyRadiationProfile && Number.isFinite(Number(el("yield").textContent.replace(/\./g, "").replace(",", "."))))
+      ? [["Monat", "Geschätzte Produktion (kWh)"], ...window.PVModel.distributeMonthlyYield(monthlyRadiationProfile, Number(el("yield").textContent.replace(/\./g, "").replace(",", "."))).map((value, index) => [monthLabels[index], value.toFixed(1)])]
+      : [["Monatliche Produktion", "Nicht verfügbar – kein vollständiges monatliches Strahlungsprofil"]]),
     ["Eigenverbrauch (kWh)", el("self-use").textContent],
     ["Jährlicher finanzieller Gesamtnutzen (EUR)", el("savings").textContent],
     ["Ersparnis durch Eigenverbrauch (EUR)", el("savings-detail").textContent.split(" · ")[0]],
