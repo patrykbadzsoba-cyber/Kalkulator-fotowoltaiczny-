@@ -20,12 +20,15 @@ Wichtig: GitHub Actions kann den Pages-Dienst nicht selbst aktivieren, wenn GitH
 - Individuell einstellbarer Strompreis und Einspeisevergütung
 - Optionale Batteriespeicher-Kapazität
 - Geschätzte Investition, jährlicher finanzieller Nutzen und einfache Amortisationszeit
+- Druckbarer Ergebnisbericht (im Druckdialog als PDF speicherbar)
+- CSV-Export der Eingaben, Annahmen und Berechnungsergebnisse
 - Responsives Layout für Smartphones und Desktop
 
 ## Modellannahmen
 
 - Rund 4,5 m² nutzbare Dachfläche je kWp installierter Leistung (vereinfachter Planungswert)
-- Standard-Ertragsbasis: 950 kWh je kWp und Jahr, angepasst mit vereinfachten Ausrichtungs- und Neigungsfaktoren
+- Standard-Ertragsbasis: 950 kWh je kWp und Jahr; bei gewähltem Standort wird sie anhand historischer Open-Meteo-Strahlungsdaten angenähert
+- Die Ziel-Anlagengröße wird anhand des geschätzten lokalen Jahresertrags sowie Dachausrichtung und -neigung dimensioniert; Dachfläche begrenzt die Größe
 - Eigenverbrauchsquote als vereinfachtes Modell, abhängig von der Speichergröße
 - Beispielmodul: 430 Wp
 - Zahlen- und Währungsformat nach deutschem Gebietsschema
