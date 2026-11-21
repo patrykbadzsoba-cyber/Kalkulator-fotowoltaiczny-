@@ -54,7 +54,7 @@ Die Software steht unter der MIT-Lizenz. Sie erlaubt auch die kostenlose kommerz
 
 ## Datenschutz und gewerblicher Einsatz
 
-Die Rechenlogik läuft im Browser. Es gibt kein Konto, keine Analyse-/Werbe-Tracker und keine Formularübermittlung. Für die Standortsuche und den standortbezogenen Ertragsrichtwert werden Suchbegriff bzw. Koordinaten an die Open-Meteo-Geocoding- und Wetter-APIs übertragen. Damit werden auch keine Interessentenanfragen an einen Installationsbetrieb übertragen. Eine gewerbliche Veröffentlichung in Deutschland benötigt vor dem Livebetrieb außerdem ein korrektes Impressum und eine auf das tatsächliche Hosting und die eingesetzten Dienste abgestimmte Datenschutzerklärung. Diese Angaben müssen vom Betreiber ergänzt und rechtlich geprüft werden.
+Die Rechenlogik läuft im Browser. Es gibt kein Konto, keine Analyse-/Werbe-Tracker und keine Formularübermittlung. Für die Standortsuche und den standortbezogenen Ertragsrichtwert werden Suchbegriff bzw. Koordinaten an die Open-Meteo-Geocoding- und Wetter-APIs übertragen. Die Kartenkacheln werden von OpenStreetMap geladen; bei einer Kartenauswahl werden die gewählten Koordinaten für die Klimadatenabfrage an Open-Meteo und für die Gebäudeumgebung an OpenStreetMap/Overpass übertragen. Damit werden auch keine Interessentenanfragen an einen Installationsbetrieb übertragen. Eine gewerbliche Veröffentlichung in Deutschland benötigt vor dem Livebetrieb außerdem ein korrektes Impressum und eine auf das tatsächliche Hosting und die eingesetzten Dienste abgestimmte Datenschutzerklärung. Diese Angaben müssen vom Betreiber ergänzt und rechtlich geprüft werden.
 
 ## Lizenz
 
