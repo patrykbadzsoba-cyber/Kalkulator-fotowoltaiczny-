@@ -34,11 +34,11 @@
         <div class="location-copy">
           <p class="eyebrow">STANDORTBEZOGENE BERECHNUNG</p>
           <h3 id="location-title">Wo steht dein Haus?</h3>
-          <p>Gib möglichst die genaue Adresse ein. Neben der lokalen Sonneneinstrahlung suchen wir nach kartierten Gebäudegrundrissen in der Umgebung.</p>
+          <p>Gib einen Ort oder eine Postleitzahl ein oder nutze deinen aktuellen Standort. Die Suche ermittelt Ortskoordinaten, keine hausnummerngenaue Dachvermessung. Zusätzlich suchen wir nach kartierten Gebäudegrundrissen in der Umgebung.</p>
         </div>
         <div class="location-controls">
-          <label class="sr-only" for="location-search">Adresse, Stadt oder Postleitzahl</label>
-          <input id="location-search" type="search" placeholder="Adresse, Stadt oder PLZ" autocomplete="street-address">
+          <label class="sr-only" for="location-search">Ort oder Postleitzahl</label>
+          <input id="location-search" type="search" placeholder="Ort oder PLZ, z. B. Hamburg" autocomplete="postal-code">
           <button id="location-search-button" type="button" class="location-button">Standort suchen</button>
           <button id="locate-button" type="button" class="location-button secondary">Meinen Standort verwenden</button>
         </div>
@@ -48,7 +48,7 @@
           <div>
             <p class="eyebrow">KARTIERTE GEBÄUDE</p>
             <h4 id="building-title">Gebäudegrundriss finden</h4>
-            <p id="building-status" class="building-status" aria-live="polite">Wähle zuerst eine möglichst genaue Adresse oder deinen Standort.</p>
+            <p id="building-status" class="building-status" aria-live="polite">Wähle zuerst einen Ort oder deinen Standort.</p>
           </div>
           <div id="building-results" class="building-results"></div>
           <p class="building-note">Quelle: OpenStreetMap. Ein Grundriss ist nicht automatisch die Dachfläche. Die vorgeschlagene nutzbare Fläche ist nur ein vorsichtiger Startwert (65 % der Gebäudegrundfläche); bitte vor der Berechnung prüfen und bei Bedarf ändern. Dachneigung, Ausrichtung, Verschattung und Statik werden damit nicht festgestellt.</p>
@@ -68,6 +68,9 @@
             <div><label for="orientation">Dachausrichtung</label><select id="orientation"><option value="1">Süd</option><option value="0.94">Südost / Südwest</option><option value="0.85" selected>Ost / West</option><option value="0.72">Nordost / Nordwest</option><option value="0.62">Nord</option></select></div>
             <div><label for="tilt">Dachneigung</label><select id="tilt"><option value="0.92">Flach (0–10°)</option><option value="0.98">Leicht (11–25°)</option><option value="1" selected>Mittel (26–40°)</option><option value="0.96">Steil (41–60°)</option><option value="0.88">Sehr steil (über 60°)</option></select></div>
           </div>
+          <label for="shading">Verschattung (geschätzter Ertragsverlust)</label>
+          <select id="shading"><option value="1">Keine / kaum Verschattung</option><option value="0.9">Leicht (ca. 10 %)</option><option value="0.8" selected>Mittel (ca. 20 %)</option><option value="0.65">Stark (ca. 35 %)</option></select>
+          <div class="field-hint">Bitte anhand der tatsächlichen Dach- und Schattenverhältnisse wählen. Dies ist eine vereinfachte Annahme.</div>
           <div class="form-heading second"><span class="step">02</span><div><h3>Deine Kosten & Ausstattung</h3><p>Für eine individuelle Beispielrechnung</p></div></div>
           <label for="electricity-price">Strompreis <span class="unit">€/kWh</span></label>
           <input id="electricity-price" type="number" min="0.05" max="1" step="0.01" value="0.32" required>
