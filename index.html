@@ -78,7 +78,7 @@
           <input id="feed-in" type="number" min="0" max="1" step="0.001" value="0.079" required>
           <label for="battery">Batteriespeicher <span class="unit">kWh</span></label>
           <input id="battery" type="number" min="0" max="30" step="0.5" value="5">
-          <div class="field-hint">0 kWh = Berechnung ohne Speicher.</div>
+          <div class="field-hint">0 kWh = Berechnung ohne Speicher. Der Eigenverbrauch wird als vereinfachte Jahres-Schätzung modelliert, nicht anhand eines stündlichen Lastprofils. Reale Werte hängen unter anderem von Verbrauchszeiten, Wechselrichter, Speichersteuerung und Wetter ab.</div>
           <label for="system-cost">Geschätzter Anlagenpreis <span class="unit">€/kWp</span></label>
           <input id="system-cost" type="number" min="500" max="5000" step="50" value="1600">
           <label for="battery-cost">Speicherpreis <span class="unit">€/kWh</span></label>
@@ -93,7 +93,7 @@
           <div class="metrics-grid">
             <article class="metric"><span>Jahresertrag</span><strong id="yield">–</strong><small>kWh/Jahr</small></article>
             <article class="metric"><span>Eigenverbrauch</span><strong id="self-use">–</strong><small id="self-use-detail">kWh/Jahr</small></article>
-            <article class="metric"><span>Stromkostenersparnis</span><strong id="savings">–</strong><small>pro Jahr</small></article>
+            <article class="metric"><span>Jährlicher Gesamtnutzen</span><strong id="savings">–</strong><small id="savings-detail">Eigenverbrauch + Einspeisung</small></article>
             <article class="metric"><span>Amortisationszeit</span><strong id="payback">–</strong><small id="investment">geschätzte Investition</small></article>
           </div>
           <div class="energy-bar-wrap"><div class="bar-label"><span>Verwendung des Solarstroms</span><span id="coverage">–</span></div><div class="energy-bar"><span id="used-bar"></span><span id="export-bar"></span></div><div class="legend"><span><i class="legend-own"></i>Eigenverbrauch</span><span><i class="legend-export"></i>Einspeisung</span></div></div>

@@ -35,7 +35,7 @@ let localYieldPerKwp = 950;
 let locationRequest = 0;
 
 function clearResults() {
-  ["system-size","panel-count","yield","self-use","self-use-detail","savings","payback","investment","coverage","summary"].forEach((id) => {
+  ["system-size","panel-count","yield","self-use","self-use-detail","savings","savings-detail","payback","investment","coverage","summary"].forEach((id) => {
     el(id).textContent = "–";
   });
   el("used-bar").style.width = "0%";
@@ -82,7 +82,9 @@ function calculate() {
   const selfConsumed = Math.min(consumption, annualYield * selfConsumptionShare);
   const exported = Math.max(0, annualYield - selfConsumed);
   const gridCoverage = Math.min(100, selfConsumed / consumption * 100);
-  const annualSavings = selfConsumed * electricityPrice + exported * feedIn;
+  const selfConsumptionSavings = selfConsumed * electricityPrice;
+  const feedInRevenue = exported * feedIn;
+  const annualSavings = selfConsumptionSavings + feedInRevenue;
   const investment = capacity * systemCost + battery * batteryCost;
   const payback = annualSavings > 0 ? investment / annualSavings : Infinity;
   const panels = Math.round(capacity * 1000 / 430);
@@ -93,6 +95,7 @@ function calculate() {
   el("self-use").textContent = number.format(selfConsumed);
   el("self-use-detail").textContent = "von " + number.format(consumption) + " kWh Verbrauch";
   el("savings").textContent = euro.format(annualSavings);
+  el("savings-detail").textContent = "Eigenverbrauch: " + euro.format(selfConsumptionSavings) + " · Einspeisung: " + euro.format(feedInRevenue);
   el("payback").textContent = Number.isFinite(payback) ? payback.toLocaleString("de-DE", {maximumFractionDigits: 1}) + " Jahre" : "–";
   el("investment").textContent = "Investition ca. " + euro.format(investment);
   el("coverage").textContent = gridCoverage.toLocaleString("de-DE", {maximumFractionDigits: 0}) + " % deines Jahresverbrauchs";
@@ -129,20 +132,28 @@ async function loadSolarEstimate(lat, lon, label) {
     if (!response.ok) throw new Error("Solar-Daten konnten nicht abgerufen werden.");
     const data = await response.json();
     if (requestId !== locationRequest) return;
-    const values = data.daily?.shortwave_radiation_sum?.filter(v => Number.isFinite(v));
-    if (!values || values.length < 300) throw new Error("Für diesen Standort liegen nicht genügend Strahlungsdaten vor.");
+    const dates = data.daily?.time || [];
+    const radiation = data.daily?.shortwave_radiation_sum || [];
+    if (dates.length !== radiation.length || dates.length < 300) {
+      throw new Error("Für diesen Standort liegen nicht genügend Strahlungsdaten vor.");
+    }
     const years = {};
-    (data.daily.time || []).forEach((date, i) => {
-      const value = data.daily.shortwave_radiation_sum[i];
+    dates.forEach((date, i) => {
+      const value = radiation[i];
       if (!Number.isFinite(value)) return;
       const year = date.slice(0, 4);
-      years[year] = (years[year] || 0) + value;
+      if (!years[year]) years[year] = { totalMj: 0, days: 0 };
+      years[year].totalMj += value;
+      years[year].days += 1;
     });
-    const annualMj = Object.values(years);
-    if (!annualMj.length) throw new Error("Die Jahreswerte konnten nicht berechnet werden.");
-    const avgAnnualKwhM2 = annualMj.reduce((a,b)=>a+b,0) / annualMj.length / 3.6;
+    // Ignore incomplete calendar years: averaging partial years as full years understates yield.
+    const completeYears = Object.values(years).filter(year => year.days >= 300);
+    if (completeYears.length < 3) {
+      throw new Error("Es liegen weniger als drei vollständige Jahre mit ausreichenden Strahlungsdaten vor.");
+    }
+    const avgAnnualKwhM2 = completeYears.reduce((sum, year) => sum + year.totalMj, 0) / completeYears.length / 3.6;
     localYieldPerKwp = Math.max(650, Math.min(1250, avgAnnualKwhM2 * 0.80));
-    locationStatus.textContent = "Standort und lokale Klimadaten geladen. Die Berechnung verwendet den Mittelwert der Jahre 2021–2025.";
+    locationStatus.textContent = "Standort und lokale Klimadaten geladen. Verwendet werden " + completeYears.length + " vollständige Kalenderjahre aus dem Zeitraum 2021–2025.";
     locationDetails.textContent = label + " · " + Math.abs(Number(lat)).toFixed(4) + "° " + (lat >= 0 ? "N" : "S") + ", " + Math.abs(Number(lon)).toFixed(4) + "° " + (lon >= 0 ? "E" : "W") + " · geschätzter Ertrag: " + number.format(localYieldPerKwp) + " kWh/kWp/Jahr.";
     locationDetails.hidden = false;
   } catch (error) {
@@ -166,8 +177,8 @@ async function searchLocation() {
     const response = await fetch(url);
     if (!response.ok) throw new Error("Standortsuche nicht verfügbar.");
     const data = await response.json();
-    const place = data.results?.find(p => p.country_code === "DE") || data.results?.[0];
-    if (!place) throw new Error("Kein passender Ort gefunden. Bitte prüfe die Eingabe.");
+    const place = data.results?.find(p => p.country_code === "DE");
+    if (!place) throw new Error("Kein passender Ort in Deutschland gefunden. Bitte prüfe die Eingabe.");
     const label = [place.name, place.admin1, place.country].filter(Boolean).join(", ");
     await loadSolarEstimate(place.latitude, place.longitude, label);
   } catch (error) {
@@ -235,7 +246,9 @@ function exportResultsCsv() {
     ["Anlagengröße (kWp)", el("system-size").textContent],
     ["Jahresertrag (kWh)", el("yield").textContent],
     ["Eigenverbrauch (kWh)", el("self-use").textContent],
-    ["Jährlicher finanzieller Nutzen (EUR)", el("savings").textContent],
+    ["Jährlicher finanzieller Gesamtnutzen (EUR)", el("savings").textContent],
+    ["Ersparnis durch Eigenverbrauch (EUR)", el("savings-detail").textContent.split(" · ")[0]],
+    ["Einspeiseerlös (EUR)", el("savings-detail").textContent.split(" · ")[1]],
     ["Geschätzte Investition", el("investment").textContent],
     ["Einfache Amortisationszeit", el("payback").textContent],
     ["Hinweis", "Modellrechnung, keine Ertragsgarantie und kein verbindliches Angebot."]
@@ -269,7 +282,9 @@ function polygonAreaM2(points) {
   const lat0 = points.reduce((sum, p) => sum + p.lat, 0) / points.length;
   const metersPerLat = 111132;
   const metersPerLon = 111320 * Math.cos(lat0 * Math.PI / 180);
-  const xy = points.map(p => ({ x: p.lon * metersPerLon, y: p.lat * metersPerLat }));
+  const originLat = points[0].lat;
+  const originLon = points[0].lon;
+  const xy = points.map(p => ({ x: (p.lon - originLon) * metersPerLon, y: (p.lat - originLat) * metersPerLat }));
   let area = 0;
   for (let i = 0; i < xy.length; i++) {
     const j = (i + 1) % xy.length;
