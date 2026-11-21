@@ -1,0 +1,5 @@
+name: Upload GitHub Pages artifact
+description: Upload the prepared Pages tar archive using the runner artifact runtime.
+runs:
+  using: node24
+  main: index.cjs
