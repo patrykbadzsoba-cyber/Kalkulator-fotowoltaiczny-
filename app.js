@@ -423,13 +423,18 @@ function initLocationMap() {
     mapStatus.textContent = "Die Kartenbibliothek konnte nicht geladen werden. Du kannst weiterhin Ort oder Postleitzahl suchen oder deinen Standort verwenden.";
     return;
   }
-  locationMap = L.map("location-map", { scrollWheelZoom: false }).setView([51.1657, 10.4515], 6);
+  locationMap = L.map("location-map", { scrollWheelZoom: false, maxBounds: [[47.27, 5.87], [55.06, 15.04]], maxBoundsViscosity: 0.9 }).setView([51.1657, 10.4515], 6);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(locationMap);
   locationMap.on("click", event => {
-    loadSolarEstimate(event.latlng.lat, event.latlng.lng, "Manuell gewählter Kartenpunkt");
+    const { lat, lng } = event.latlng;
+    if (lat < 47.27 || lat > 55.06 || lng < 5.87 || lng > 15.04) {
+      mapStatus.textContent = "Bitte wähle einen Standort innerhalb Deutschlands.";
+      return;
+    }
+    loadSolarEstimate(lat, lng, "Manuell gewählter Kartenpunkt");
   });
   mapStatus.textContent = "Karte bereit. Wähle einen Punkt auf der Karte oder suche oben nach Stadt oder Postleitzahl.";
 }
