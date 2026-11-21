@@ -63,3 +63,40 @@
 .map-status{margin:8px 0 0}
 .leaflet-container{font-family:'DM Sans',sans-serif}
 @media(max-width:540px){#location-map{height:250px}.map-wrap{padding:10px}}
+
+/* 2026 refresh: vivid but accessible solar palette and resilient mobile cards */
+:root{--bg:#0b1220;--panel:#121e30;--panel2:#1a2b40;--text:#f7fbff;--muted:#b4c4d8;--line:#344b66;--lime:#c8ff3d;--cyan:#35e0d0;--violet:#a78bfa;--orange:#ff9b42;--pink:#ff6fae}
+body{background:radial-gradient(ellipse at 12% 0%,#263b5a 0,transparent 34%),radial-gradient(ellipse at 92% 18%,#3a2058 0,transparent 27%),var(--bg)}
+.site-header{border-bottom-color:#3b5574;background:#0b1220cc;backdrop-filter:blur(14px)}
+.brand-mark{background:linear-gradient(135deg,var(--lime),var(--orange));box-shadow:0 0 24px #c8ff3d35}
+.brand-light{color:var(--cyan)}.eyebrow{color:var(--orange)}
+.hero h1{background:linear-gradient(100deg,#fff 8%,var(--lime) 55%,var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+.primary-link,.location-button,.report-actions button,.building-apply{background:linear-gradient(110deg,var(--lime),#8df0a5);box-shadow:0 7px 22px #a6ff4630;transition:transform .18s ease,filter .18s ease}
+.primary-link:hover,.location-button:hover,.report-actions button:hover,.building-apply:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.sun-core{background:radial-gradient(circle at 35% 30%,#fff7b5,var(--orange) 42%,var(--pink));box-shadow:0 0 90px #ff9b4266}
+.sun-orbit{border-color:#35e0d077;box-shadow:0 0 36px #35e0d01c}
+.panel-graphic{border-color:var(--cyan);background:linear-gradient(135deg,#143f63,#3a2871)}
+.panel-graphic i{background:linear-gradient(135deg,#2689a7,#7565d8);border-color:#91f4ed88}
+.calculator-section{border-top-color:#3b5574}
+.input-panel,.location-panel{background:linear-gradient(145deg,#17263b,#101b2d);border-color:#3a5270;box-shadow:0 16px 44px #02081755}
+.results-panel{background:linear-gradient(145deg,#1b3150,#18233e 58%,#252044);border-color:#53658d;box-shadow:0 18px 50px #02081777}
+.step{background:#c8ff3d20;color:var(--lime);border:1px solid #c8ff3d55}
+.input-panel input:focus,.input-panel select:focus,.location-controls input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #35e0d02b}
+.main-result{background:linear-gradient(120deg,#c8ff3d18,#35e0d012);border-color:#c8ff3d88}
+.main-result strong{color:var(--lime);text-shadow:0 0 24px #c8ff3d22}
+.metric{background:linear-gradient(145deg,#ffffff0b,#a78bfa0b);border-color:#53617e}
+.metric:nth-child(2){border-color:#35e0d066}.metric:nth-child(3){border-color:#ff9b4266}.metric:nth-child(4){border-color:#a78bfa77}
+.metric:nth-child(2) strong{color:var(--cyan)}.metric:nth-child(3) strong{color:var(--orange)}.metric:nth-child(4) strong{color:#c4b5fd}
+.energy-bar #used-bar{background:linear-gradient(90deg,var(--lime),#8df0a5)}.energy-bar #export-bar{background:linear-gradient(90deg,var(--cyan),#579cff)}
+.assumption-box{background:linear-gradient(120deg,#35e0d018,#a78bfa12);border-color:#35e0d066}.assumption-box strong{color:var(--cyan)}
+.disclaimer{padding:14px 15px;border-left:3px solid var(--orange);border-radius:0 10px 10px 0;background:#ff9b4210;color:#c4d0df;font-size:11px;line-height:1.65}
+.monthly-panel,.map-wrap,.building-panel{background:#0d192b;border-color:#3b5574}
+.month-bar{background:linear-gradient(180deg,var(--orange),var(--pink),var(--violet))}.month-track{background:#293b58}
+.location-status{color:var(--cyan)}
+.location-button.secondary,.report-actions button.secondary{background:#263a58;color:#7df5e9;border-color:#35e0d077;box-shadow:none}
+.partner-cta{background:linear-gradient(110deg,#c8ff3d18,#35e0d018);border-color:#c8ff3d77}.partner-cta strong{color:var(--lime)}
+footer{border-top-color:#3b5574;color:#a9bad0}
+.assumption-box,.disclaimer,.monthly-panel,.map-wrap,.building-panel,.metric,.main-result{min-width:0;overflow-wrap:anywhere}
+.assumption-box p{line-height:1.7}.disclaimer{margin-top:16px}#location-map{outline:1px solid #35e0d055}
+@media(max-width:540px){.hero h1{font-size:clamp(34px,10vw,42px)}.input-panel,.results-panel{padding:17px}.metrics-grid{gap:8px}.metric{padding:12px}.metric strong{font-size:18px}.assumption-box{padding:14px}.disclaimer{font-size:11px;margin-top:14px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
