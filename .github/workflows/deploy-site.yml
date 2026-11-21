@@ -4,9 +4,10 @@ on:
     branches: ["main"]
 permissions:
   contents: read
+  pages: write
   id-token: write
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "OIDC permission test"
+      - run: echo "Pages and OIDC permission test"
