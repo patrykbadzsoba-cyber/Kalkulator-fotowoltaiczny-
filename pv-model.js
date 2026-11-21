@@ -57,5 +57,16 @@
     };
   }
 
-  return { estimate };
+  function distributeMonthlyYield(monthlyRadiation, annualYield) {
+    if (!Array.isArray(monthlyRadiation) || monthlyRadiation.length !== 12 ||
+        monthlyRadiation.some(value => !Number.isFinite(value) || value < 0) ||
+        !Number.isFinite(annualYield) || annualYield < 0) {
+      throw new TypeError("Monthly radiation must contain 12 non-negative finite values and annual yield must be non-negative.");
+    }
+    const total = monthlyRadiation.reduce((sum, value) => sum + value, 0);
+    if (total <= 0) throw new RangeError("Monthly radiation total must be greater than zero.");
+    return monthlyRadiation.map(value => annualYield * value / total);
+  }
+
+  return { estimate, distributeMonthlyYield };
 });
