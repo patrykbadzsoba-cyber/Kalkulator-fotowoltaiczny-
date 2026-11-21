@@ -1,0 +1,25 @@
+name: Validate PVGIS proxy source
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "worker/**"
+      - ".github/workflows/pvgis-proxy-validation.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "worker/**"
+      - ".github/workflows/pvgis-proxy-validation.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Check Worker module syntax
+        run: node --input-type=module --check < worker/pvgis-proxy.js

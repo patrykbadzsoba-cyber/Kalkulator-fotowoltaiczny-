@@ -30,6 +30,8 @@ jobs:
           test -s styles.css
           test -s pv-model.js
           test -s tests/pv-model.test.js
+          test -s worker/pvgis-proxy.js
+          node --input-type=module --check < worker/pvgis-proxy.js
           node --check pv-model.js
           node --check app.js
           node --test
