@@ -44,6 +44,13 @@ export default {
     if (request.method !== "GET") return json({ error: "Method not allowed" }, 405, allowedOrigin);
 
     const incoming = new URL(request.url);
+    const required = ["lat", "lon", "angle", "aspect"];
+    if (required.some((key) => {
+      const value = incoming.searchParams.get(key);
+      return value === null || value.trim() === "";
+    })) {
+      return json({ error: "Missing required PVGIS parameters" }, 400, allowedOrigin);
+    }
     const lat = Number(incoming.searchParams.get("lat"));
     const lon = Number(incoming.searchParams.get("lon"));
     const angle = Number(incoming.searchParams.get("angle"));
