@@ -10,4 +10,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Pages and OIDC permission test"
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
