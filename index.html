@@ -14,7 +14,6 @@
     <a class="brand" href="#" aria-label="PV Rechner Startseite"><span class="brand-mark">☀</span><span>PV<span class="brand-light">RECHNER</span></span></a>
     <span class="header-note">Unabhängig. Kostenlos. Transparent.</span>
   </header>
-
   <main>
     <section class="hero">
       <div class="hero-copy">
@@ -25,47 +24,50 @@
       </div>
       <div class="sun-graphic" aria-hidden="true"><div class="sun-core"></div><div class="sun-orbit"></div><div class="panel-graphic"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
     </section>
-
     <section class="calculator-section" id="rechner">
       <div class="section-heading">
         <p class="eyebrow">DEIN ZUHAUSE · DEINE ZAHLEN</p>
         <h2>Photovoltaik-Potenzial berechnen</h2>
         <p>Ändere die Werte – die Ergebnisse aktualisieren sich automatisch.</p>
       </div>
-
       <section class="location-panel" aria-labelledby="location-title">
         <div class="location-copy">
           <p class="eyebrow">STANDORTBEZOGENE BERECHNUNG</p>
           <h3 id="location-title">Wo steht dein Haus?</h3>
-          <p>Wähle deinen Standort oder nutze deinen aktuellen Standort. Wir beziehen die lokale Sonneneinstrahlung in die Ertragsabschätzung ein.</p>
+          <p>Gib möglichst die genaue Adresse ein. Neben der lokalen Sonneneinstrahlung suchen wir nach kartierten Gebäudegrundrissen in der Umgebung.</p>
         </div>
         <div class="location-controls">
-          <label class="sr-only" for="location-search">Stadt oder Postleitzahl</label>
-          <input id="location-search" type="search" placeholder="Stadt oder PLZ, z. B. Hamburg" autocomplete="postal-code">
+          <label class="sr-only" for="location-search">Adresse, Stadt oder Postleitzahl</label>
+          <input id="location-search" type="search" placeholder="Adresse, Stadt oder PLZ" autocomplete="street-address">
           <button id="location-search-button" type="button" class="location-button">Standort suchen</button>
           <button id="locate-button" type="button" class="location-button secondary">Meinen Standort verwenden</button>
         </div>
         <p id="location-status" class="location-status" role="status" aria-live="polite">Noch kein Standort gewählt. Ohne Standort wird mit einem allgemeinen Richtwert gerechnet.</p>
         <p id="location-details" class="location-details" hidden></p>
-        <p class="location-privacy">Für die Standortsuche und Ertragsabschätzung werden Suchbegriff bzw. Koordinaten an Open-Meteo übertragen. Deine übrigen Rechner-Eingaben werden nicht übermittelt.</p>
+        <section class="building-panel" aria-labelledby="building-title">
+          <div>
+            <p class="eyebrow">KARTIERTE GEBÄUDE</p>
+            <h4 id="building-title">Gebäudegrundriss finden</h4>
+            <p id="building-status" class="building-status" aria-live="polite">Wähle zuerst eine möglichst genaue Adresse oder deinen Standort.</p>
+          </div>
+          <div id="building-results" class="building-results"></div>
+          <p class="building-note">Quelle: OpenStreetMap. Ein Grundriss ist nicht automatisch die Dachfläche. Die vorgeschlagene nutzbare Fläche ist nur ein vorsichtiger Startwert (65 % der Gebäudegrundfläche); bitte vor der Berechnung prüfen und bei Bedarf ändern. Dachneigung, Ausrichtung, Verschattung und Statik werden damit nicht festgestellt.</p>
+        </section>
+        <p class="location-privacy">Für Standortsuche, Klimadaten und Gebäudeabfrage werden Suchbegriff bzw. Koordinaten an Open-Meteo und OpenStreetMap/Overpass übertragen. Deine übrigen Rechner-Eingaben werden nicht übermittelt.</p>
       </section>
-
       <div class="calculator-layout">
         <form id="pv-form" class="input-panel">
           <div class="form-heading"><span class="step">01</span><div><h3>Angaben zum Haus</h3><p>Die wichtigsten Eckdaten deiner Immobilie</p></div></div>
           <label for="consumption">Jährlicher Stromverbrauch <span class="unit">kWh/Jahr</span></label>
           <input id="consumption" type="number" min="500" max="30000" step="100" value="4000" required>
           <div class="field-hint">Findest du auf deiner letzten Stromabrechnung.</div>
-
           <label for="roof-area">Nutzbare Dachfläche <span class="unit">m²</span></label>
           <input id="roof-area" type="number" min="6" max="500" step="1" value="50" required>
           <div class="field-hint">Abzüglich Fenster, Gauben und dauerhaft verschatteter Flächen.</div>
-
           <div class="two-columns">
             <div><label for="orientation">Dachausrichtung</label><select id="orientation"><option value="1">Süd</option><option value="0.94">Südost / Südwest</option><option value="0.85" selected>Ost / West</option><option value="0.72">Nordost / Nordwest</option><option value="0.62">Nord</option></select></div>
             <div><label for="tilt">Dachneigung</label><select id="tilt"><option value="0.92">Flach (0–10°)</option><option value="0.98">Leicht (11–25°)</option><option value="1" selected>Mittel (26–40°)</option><option value="0.96">Steil (41–60°)</option><option value="0.88">Sehr steil (über 60°)</option></select></div>
           </div>
-
           <div class="form-heading second"><span class="step">02</span><div><h3>Deine Kosten & Ausstattung</h3><p>Für eine individuelle Beispielrechnung</p></div></div>
           <label for="electricity-price">Strompreis <span class="unit">€/kWh</span></label>
           <input id="electricity-price" type="number" min="0.05" max="1" step="0.01" value="0.32" required>
@@ -80,7 +82,6 @@
           <input id="battery-cost" type="number" min="100" max="2000" step="50" value="600">
           <button class="reset-button" type="reset">Eingaben zurücksetzen</button>
         </form>
-
         <section class="results-panel" aria-live="polite" aria-label="Berechnungsergebnisse">
           <div class="results-top"><div><p class="eyebrow">DEINE ERSTE SCHÄTZUNG</p><h3>Dein PV-Ergebnis</h3></div><span class="live-dot">Live-Berechnung</span></div>
           <div class="report-actions"><button id="print-report" type="button">Bericht drucken / als PDF speichern</button><button id="export-csv" type="button" class="secondary">Ergebnisse als CSV</button></div>
@@ -94,10 +95,7 @@
           </div>
           <div class="energy-bar-wrap"><div class="bar-label"><span>Verwendung des Solarstroms</span><span id="coverage">–</span></div><div class="energy-bar"><span id="used-bar"></span><span id="export-bar"></span></div><div class="legend"><span><i class="legend-own"></i>Eigenverbrauch</span><span><i class="legend-export"></i>Einspeisung</span></div></div>
           <div class="assumption-box"><strong>Was bedeutet das?</strong><p id="summary">Gib deine Daten ein, um eine erste Orientierung zu erhalten.</p></div>
-          <div id="partner-cta" class="partner-cta" hidden>
-            <div><strong id="partner-cta-title">Nächster Schritt</strong><p>Du möchtest deine Planung mit einem Fachbetrieb besprechen? Öffne direkt dessen Kontaktseite.</p></div>
-            <a id="partner-cta-link" href="#" target="_blank" rel="noopener noreferrer">Beratung anfragen <span aria-hidden="true">↗</span></a>
-          </div>
+          <div id="partner-cta" class="partner-cta" hidden><div><strong id="partner-cta-title">Nächster Schritt</strong><p>Du möchtest deine Planung mit einem Fachbetrieb besprechen? Öffne direkt dessen Kontaktseite.</p></div><a id="partner-cta-link" href="#" target="_blank" rel="noopener noreferrer">Beratung anfragen <span aria-hidden="true">↗</span></a></div>
           <p class="disclaimer">Wichtiger Hinweis: Dies ist eine vereinfachte Modellrechnung, keine Ertragsgarantie und kein verbindliches Angebot. Verschattung, Standort, Statik, Netzanschluss, Steuern, Finanzierung, laufende Kosten und aktuelle Vergütungssätze können das Ergebnis verändern. Vor einer Investition ist eine fachliche Prüfung vor Ort erforderlich.</p>
         </section>
       </div>
