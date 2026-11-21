@@ -1,115 +1,101 @@
 # PV-Rechner Deutschland — Produktionsreife
 
-Stand: 21.11.2026  
-Status: technischer Arbeitsplan; Funktionen gelten erst nach Live-Test als fertig.
+Stand: 21.11.2026
 
-## 1. Bestand (im Repository geprüft)
+## 1. Status der Version auf main
 
-Bereits vorhanden:
-- Standortsuche über Open-Meteo Geocoding und Browser-Geolocation
-- Gebäudegrundrisse über OpenStreetMap/Overpass als unverbindliche Orientierung
-- Eingaben für Verbrauch, Dachfläche, Ausrichtung, Neigung, Verschattung, Strompreis, Einspeisevergütung und Speicher
-- automatische Modellrechnung
-- Druckansicht für PDF sowie CSV-Export
-- GitHub Pages Deployment
+Der aktuelle Quellcode enthält bereits:
+- Rechnerformular mit Jahresverbrauch, Dachfläche, Ausrichtung, Neigung, Verschattung, Strompreis, Einspeisevergütung und Speicher.
+- automatische Berechnung von Anlagengröße, Modulanzahl, Jahresertrag, Eigenverbrauch, Einspeisung, finanziellem Nutzen und statischer Amortisationszeit.
+- Standortsuche über Open-Meteo Geocoding und Browser-Geolocation.
+- standortbezogene Ertragsannahme aus historischen Open-Meteo-Strahlungsdaten (2021–2025), sofern mindestens drei ausreichend vollständige Kalenderjahre verfügbar sind.
+- Monatsdiagramm und Monatswerte im CSV-Export. Die Monatsverteilung skaliert das historische Strahlungsprofil auf den geschätzten Jahresertrag.
+- Druckansicht für PDF und CSV-Export.
+- optionale Weiterleitung zu einer Partner-Kontaktseite über HTTPS-URL-Parameter.
+- unverbindliche OpenStreetMap-Gebäudegrundrisssuche in der Nähe des ausgewählten Punkts.
 
-Aktuelle fachliche Grenzen:
-- Der standortbezogene Ertrag wird aus Open-Meteo-Strahlungsdaten und einem pauschalen Faktor abgeleitet; das ist keine PVGIS-Systemsimulation.
-- Die Monatsproduktion wird nicht ausgewiesen.
-- Der Eigenverbrauch wird aus einer vereinfachten Jahresquote abgeleitet; ein stündliches Lastprofil und eine zeitliche Speicher-Simulation fehlen.
-- Die Amortisation ist eine einfache Division von Investition durch jährlichen Nutzen; laufende Kosten, Degradation, Ersatzinvestitionen, Finanzierung und Preisentwicklung fehlen.
-- Die Gebäudegrundriss-Erkennung vermisst kein Dach. Der 65-%-Wert bleibt eine unverbindliche Startannahme.
+Wichtig: Die Standortsuche und Geolokalisierung sind vorhanden, aber es gibt derzeit keine interaktive Kartenoberfläche mit frei verschiebbarem Kartenmarker. Der Gebäudegrundriss ist kein Dachaufmaß und darf nicht als bestätigte Dachfläche ausgegeben werden.
 
-## 2. Technische Voraussetzung für PVGIS
+## 2. Fachliche Grenzen
 
-Die offizielle JRC-Dokumentation bestätigt:
-- PVGIS 5.3 stellt den PVcalc-Endpunkt unter /api/v5_3/PVcalc bereit.
-- PVcalc liefert Jahres- und Monatswerte für netzgekoppelte PV-Anlagen.
-- Direkte AJAX-Aufrufe an PVGIS aus dem Browser sind ausdrücklich nicht erlaubt.
+- Die aktuelle Live-Berechnungslogik verwendet Open-Meteo-Strahlungsdaten und einen vereinfachten Ertragsfaktor. Sie ist keine PVGIS-Systemsimulation.
+- Monatswerte sind eine modellierte Verteilung des geschätzten Jahresertrags anhand historischer monatlicher Globalstrahlung; keine PVGIS-Monatswerte und keine Messwerte.
+- Eigenverbrauch und Speicherwirkung beruhen auf einer vereinfachten Jahresquote. Es gibt keine stündliche Verbrauchs- oder Speicher-Simulation.
+- Die Amortisation ist eine statische Näherung: Investition geteilt durch den modellierten jährlichen Nutzen. Laufende Kosten, Degradation, Ersatzinvestitionen, Finanzierung, Steuern und Preisentwicklung sind nicht vollständig modelliert.
+- Preise für Anlage und Speicher sind editierbare Beispielannahmen, keine Marktpreis-Zusage.
+- Die Gebäudefläche aus OpenStreetMap ist nur eine Orientierung. Der 65-%-Startwert ist eine grobe Annahme und muss vom Nutzer geprüft werden.
 
-Daraus folgt: Der statische GitHub-Pages-Client darf PVGIS nicht direkt aufrufen. Vor der UI-Integration muss ein eigener serverseitiger Proxy bereitgestellt werden (z. B. ein kostenloser Worker-Endpunkt). Der Client ruft danach ausschließlich diesen eigenen Proxy auf. Solange der Proxy nicht deployed und getestet ist, bleibt die vorhandene Open-Meteo-Schätzung aktiv und wird nicht als PVGIS ausgegeben.
+## 3. PVGIS-Proxy — vorbereitet, aber nicht produktiv integriert
 
-## 3. Umsetzung in Arbeitspaketen
+Im Repository vorhanden:
+- `worker/pvgis-proxy.js`: Cloudflare Worker-Proxy für PVGIS 5.3 mit Parameterprüfung, CORS-Allowlist, Timeout, Antwortprüfung und Cache.
+- `wrangler.toml`: Worker-Konfiguration.
+- `.github/workflows/deploy-pvgis-worker.yml`: Workflow für die Bereitstellung bei Änderungen an Worker-Dateien.
 
-### A — PVGIS-Proxy und Ertragsmodell
-- Serverlosen Proxy mit fester PVGIS-Upstream-Adresse bereitstellen.
-- Nur erforderliche Parameter akzeptieren: Koordinaten, Neigung und Azimut.
-- Wertebereiche serverseitig validieren; Peakpower und Systemverluste als kontrollierte Modellparameter setzen.
-- CORS ausschließlich für die tatsächliche Rechner-Domain erlauben; keine Wildcard-Freigabe.
-- Upstream-Fehler und Timeouts kontrolliert behandeln; Antworten kurzzeitig cachen. Rate-Limits müssen zusätzlich auf der Hosting-Ebene konfiguriert werden.
-- PVGIS 5.3 JSON-Antwort mit Jahreswert E_y und zwölf Monatswerten E_m validieren.
-- Azimut-Konvention dokumentieren: 0° Süd, +90° West, -90° Ost.
-- Quelle, API-Version, Abrufdatum, Koordinaten und verwendete Parameter im Bericht ausweisen.
-- Fallback nur als vereinfachte Schätzung kennzeichnen.
+Noch nicht bestätigt:
+- erfolgreicher Cloudflare-Worker-Deploy;
+- aktive Worker-URL;
+- erfolgreicher Live-Aufruf mit erlaubtem CORS-Origin;
+- Integration der Worker-URL in das Frontend;
+- Anzeige von verifizierten PVGIS-Jahres- und Monatswerten.
 
-### B — Monatliche Energiebilanz
-- Monatsproduktion in kWh anzeigen.
-- Monatliche Verbrauchsverteilung als explizite Annahme kennzeichnen; zunächst darf ein gleichmäßiger Monatsverbrauch als Standard dienen.
-- Eigenverbrauch und Einspeisung nicht als gemessene Werte darstellen.
-- Speicherwirkung nur mit klar ausgewiesener Modellannahme berechnen; keine stündliche Simulation behaupten, solange kein Lastprofil vorliegt.
+Der Client darf PVGIS nicht direkt aus dem Browser aufrufen. Bis Proxy-Deploy und Live-Test abgeschlossen sind, muss die App ihre vorhandene Open-Meteo-Schätzung klar als Schätzung kennzeichnen. Es darf keine PVGIS-Integration behauptet werden.
 
-### C — Wirtschaftlichkeit
-- Investitionskosten getrennt nach PV-Anlage und Speicher ausweisen.
-- Jährliche Einsparung durch vermiedenen Netzbezug und Einspeiseerlös separat ausweisen.
-- Laufende Kosten und optionale Ersatzinvestitionen als Eingaben oder klar sichtbare Annahmen ergänzen.
-- Einfache Amortisationszeit ausdrücklich als statische Näherung bezeichnen.
-- Optional eine mehrjährige Cashflow-Sicht mit Degradation und Sensitivität ergänzen.
-- Keine Renditegarantie, keine verbindliche Finanzierungs- oder Steuerberatung.
+### Cloudflare-Voraussetzungen
 
-### D — Bericht
-- PDF-Bericht mit Standort, Dachannahmen, PVGIS-Quelle/Parametern, Monatswerten, Wirtschaftlichkeit und Warnhinweisen.
-- CSV mit Rohwerten und Einheiten; deutsche Zahlen-/Dezimalformate korrekt handhaben.
-- Bericht muss Datum und Modellversion enthalten.
+Der Deploy-Workflow benötigt die GitHub-Actions-Secrets:
+- `CLOUDFLARE_API_TOKEN` — Cloudflare API Token mit Workers Scripts: Edit.
+- `CLOUDFLARE_ACCOUNT_ID` — Account-ID des Cloudflare-Kontos.
 
-### E — Qualität / Freigabe
-- Unit-Tests für Größenbegrenzung, Ertrag, Eigenverbrauch, Einspeisung, Kosten und Grenzfälle.
-- Proxy-Tests für gültige Parameter, ungültige Koordinaten, Upstream-Fehler, Timeout und CORS.
-- Browser-Tests für Standortsuche, manuelle Eingaben, PDF-Druck und CSV-Export.
-- Mobilansicht und Tastaturbedienung prüfen.
-- GitHub Actions muss Syntaxprüfung und Tests vor Deployment ausführen.
-- Nach Deployment Live-URL, HTTP-Erreichbarkeit und Kernfunktionen tatsächlich prüfen.
+Außerdem muss die `workers.dev`-Subdomain des Kontos aktiviert sein. Diese Kontoeinstellungen und Secrets können nicht aus dem GitHub-Quellcode abgeleitet oder durch einen normalen Repository-Datei-Commit ersetzt werden. Keine Zugangsdaten in den Quellcode schreiben.
 
-## 4. Freigabekriterien
+## 4. GitHub Actions / Veröffentlichung
 
-Die Anwendung darf erst als verkaufsfähig bezeichnet werden, wenn:
-- PVGIS-Proxy deployed und erreichbar ist;
-- PVGIS-Jahres- und Monatswerte nachweislich geladen werden;
-- Monats- und Jahreswerte reproduzierbar sind;
-- die verwendeten Annahmen im UI und Bericht sichtbar sind;
-- Tests automatisiert laufen und erfolgreich sind;
-- PDF-/CSV-Exporte die angezeigten Werte korrekt wiedergeben;
-- ein kompletter Testlauf auf Mobilgerät und Desktop dokumentiert ist;
-- Impressum, Datenschutzinformationen und Verantwortlichkeit für den Betrieb geklärt sind.
+- Pull Request #8 (Monatsproduktion und Tests) ist in `main` gemergt.
+- Pull Request #6 (PVGIS-Proxy-Vorbereitung und Produktionsreife-Dokumentation) ist in `main` gemergt.
+- Für Commit `2a4285c4a203639e294433529603ea45ea629368` wurde der GitHub-Pages-Workflow am 21.11.2026 um 11:51 UTC erfolgreich abgeschlossen.
+- Für spätere Main-Commits `acd3c568d790b1600f790af4fb31387f68305637` und `6e604a7652b573b4e8349f5c5f46dbe85ef03624` meldete GitHub Actions `startup_failure`. Diese Runs hatten keine angelegten Jobs. Daher ist ein erfolgreiches Deployment des neuesten Main-Commits nicht bestätigt.
+- Der Cloudflare-Deploy-Workflow für Commit `2a4285c4a203639e294433529603ea45ea629368` endete mit `failure`; der spätere Run endete mit `startup_failure`. Ein erfolgreicher Worker-Deploy ist nicht belegt.
 
-## 5. Unverhandelbare Produktregeln
+Die erfolgreiche ältere Pages-Ausführung beweist nicht, dass der neueste Stand live ist. Die öffentliche URL muss nach einem erfolgreichen aktuellen Deployment separat per HTTP und Browser getestet werden.
+
+## 5. Automatisierte Tests
+
+Vorhandene Node.js-Tests prüfen:
+- Dimensionierung anhand von Verbrauch und Dachfläche;
+- Begrenzung durch Dachfläche;
+- Energiebilanz aus Eigenverbrauch und Einspeisung;
+- vereinfachten Batterieeffekt;
+- Kostenberechnung und ungültige Eingaben;
+- Monatsverteilung, saisonalen Verlauf und ungültige Strahlungsprofile.
+
+Der Pages-Workflow führt Syntaxprüfungen und `node --test` aus. Diese Unit-Tests sind kein Ersatz für Browser-End-to-End-Tests auf Mobilgerät und Desktop.
+
+## 6. Freigabekriterien für kommerzielle Nutzung
+
+Die Anwendung darf erst als vollständig produktionsreif oder als PVGIS-basiert beworben werden, wenn:
+1. der aktuelle Main-Stand erfolgreich veröffentlicht wurde;
+2. die öffentliche URL von außen erreichbar ist;
+3. Formular, Standortsuche, Berechnung, Monatsdiagramm, CSV und Druck/PDF im Browser getestet wurden;
+4. die Worker-URL eingerichtet und der PVGIS-Live-Aufruf einschließlich CORS und zwölf Monatswerten verifiziert wurde, falls PVGIS beworben werden soll;
+5. Impressum und Datenschutzerklärung für den tatsächlichen Betreiber und das Hosting ergänzt wurden;
+6. die Annahmen und Modellgrenzen in UI und Bericht sichtbar bleiben.
+
+## 7. Unverhandelbare Produktregeln
 
 - Keine erfundenen Daten, Kunden, Partner, Bewertungen oder Testergebnisse.
-- Keine versteckten Kosten und keine irreführenden Versprechen.
+- Keine Rendite- oder Ertragsgarantie.
+- Keine versteckten Kosten oder irreführenden Versprechen.
 - Keine Übermittlung von Verbrauchs- und Kosteneingaben an externe Dienste.
 - Standort- und API-Datenübertragung transparent erklären.
 - Markenneutral bleiben.
-- Eine Schätzung klar als Schätzung kennzeichnen.
+- Schätzungen klar als Schätzungen kennzeichnen.
+- MIT-Lizenz beachten: kostenpflichtig angeboten werden können zusätzliche Dienstleistungen wie Einrichtung, individuelle Anpassung, Hosting-Betreuung und Support, nicht ein exklusives Nutzungsrecht am bestehenden Code.
 
-## 6. Nächste technische Reihenfolge
+## 8. Nächste technische Schritte
 
-1. Serverseitigen PVGIS-Proxy bereitstellen und testen.
-2. PVGIS-Jahres- und Monatsdaten in UI, CSV und PDF integrieren.
-3. Modell für Verbrauch, Speicher und Wirtschaftlichkeit präzisieren.
-4. automatisierte Tests und CI ergänzen.
-5. PRs prüfen, mergen und erst danach Live-Version validieren.
-
-## 7. Cloudflare Worker deployment
-
-The repository now contains `wrangler.toml` and a GitHub Actions deployment workflow. The workflow deploys the Worker only after changes reach `main`; it does not run for pull requests.
-
-One-time account setup required (cannot be performed by a GitHub repository token):
-1. In Cloudflare, create an API token with **Workers Scripts: Edit** permission for the target account.
-2. Copy the Cloudflare account ID from the account overview.
-3. In GitHub repository Settings → Secrets and variables → Actions, add:
-   - `CLOUDFLARE_API_TOKEN` — the token (secret).
-   - `CLOUDFLARE_ACCOUNT_ID` — the account ID (secret).
-4. In Cloudflare, ensure the account's `workers.dev` subdomain is enabled.
-
-The Worker is configured to allow only the calculator origin `https://patrykbadzsoba-cyber.github.io`. After deployment, Cloudflare will provide the Worker URL in the Actions log. The frontend must not be switched to PVGIS until that URL is known and live CORS, upstream response, and monthly data have been tested.
-
-No token, account ID, or other credential should be committed to the repository.
+1. Einen neuen erfolgreichen Pages-Workflow auf dem aktuellen `main` erzielen und die öffentliche URL verifizieren.
+2. Cloudflare-Secrets und `workers.dev`-Subdomain prüfen; Worker deployen und die URL ermitteln.
+3. Worker-URL in die Frontend-Konfiguration integrieren; PVGIS-Jahres- und Monatswerte nur nach erfolgreichem Live-Test verwenden.
+4. Interaktive Kartenwahl und Adress-/Standortbestätigung ergänzen, falls die Nutzerführung dies erfordert.
+5. Browser-End-to-End-Tests und rechtliche Betreiberangaben abschließen.
