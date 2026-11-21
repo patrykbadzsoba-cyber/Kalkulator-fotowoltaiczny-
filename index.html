@@ -65,8 +65,8 @@
           <input id="roof-area" type="number" min="6" max="500" step="1" value="50" required>
           <div class="field-hint">Abzüglich Fenster, Gauben und dauerhaft verschatteter Flächen.</div>
           <div class="two-columns">
-            <div><label for="orientation">Dachausrichtung</label><select id="orientation"><option value="1" data-aspect="0">Süd</option><option value="0.97" data-aspect="-45">Südost</option><option value="0.97" data-aspect="45">Südwest</option><option value="0.85" data-aspect="-90" selected>Ost</option><option value="0.85" data-aspect="90">West</option><option value="0.72" data-aspect="-135">Nordost</option><option value="0.72" data-aspect="135">Nordwest</option><option value="0.62" data-aspect="180">Nord</option></select></div>
-            <div><label for="tilt">Dachneigung</label><select id="tilt"><option value="0.92" data-angle="8">Flach (0–10°)</option><option value="0.98" data-angle="18">Leicht (11–25°)</option><option value="1" data-angle="33" selected>Mittel (26–40°)</option><option value="0.96" data-angle="50">Steil (41–60°)</option><option value="0.88" data-angle="65">Sehr steil (über 60°)</option></select></div>
+            <div><label for="orientation">Dachausrichtung</label><select id="orientation"><option value="1">Süd</option><option value="0.94">Südost / Südwest</option><option value="0.85" selected>Ost / West</option><option value="0.72">Nordost / Nordwest</option><option value="0.62">Nord</option></select></div>
+            <div><label for="tilt">Dachneigung</label><select id="tilt"><option value="0.92">Flach (0–10°)</option><option value="0.98">Leicht (11–25°)</option><option value="1" selected>Mittel (26–40°)</option><option value="0.96">Steil (41–60°)</option><option value="0.88">Sehr steil (über 60°)</option></select></div>
           </div>
           <label for="shading">Verschattung (geschätzter Ertragsverlust)</label>
           <select id="shading"><option value="1">Keine / kaum Verschattung</option><option value="0.9">Leicht (ca. 10 %)</option><option value="0.8" selected>Mittel (ca. 20 %)</option><option value="0.65">Stark (ca. 35 %)</option></select>
@@ -96,7 +96,6 @@
             <article class="metric"><span>Jährlicher Gesamtnutzen</span><strong id="savings">–</strong><small id="savings-detail">Eigenverbrauch + Einspeisung</small></article>
             <article class="metric"><span>Amortisationszeit</span><strong id="payback">–</strong><small id="investment">geschätzte Investition</small></article>
           </div>
-          <section id="monthly-production" class="monthly-production" hidden aria-label="Monatliche PV-Produktion"><h4>Monatliche Produktion laut PVGIS</h4><p>PVGIS-Monatsmittel; tatsächliche Erträge können abweichen.</p><table><tbody id="monthly-production-body"></tbody></table></section>
           <div class="energy-bar-wrap"><div class="bar-label"><span>Verwendung des Solarstroms</span><span id="coverage">–</span></div><div class="energy-bar"><span id="used-bar"></span><span id="export-bar"></span></div><div class="legend"><span><i class="legend-own"></i>Eigenverbrauch</span><span><i class="legend-export"></i>Einspeisung</span></div></div>
           <div class="assumption-box"><strong>Was bedeutet das?</strong><p id="summary">Gib deine Daten ein, um eine erste Orientierung zu erhalten.</p></div>
           <div id="partner-cta" class="partner-cta" hidden><div><strong id="partner-cta-title">Nächster Schritt</strong><p>Du möchtest deine Planung mit einem Fachbetrieb besprechen? Öffne direkt dessen Kontaktseite.</p></div><a id="partner-cta-link" href="#" target="_blank" rel="noopener noreferrer">Beratung anfragen <span aria-hidden="true">↗</span></a></div>
