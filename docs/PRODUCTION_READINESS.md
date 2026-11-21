@@ -1,7 +1,7 @@
 # PV-Rechner Deutschland — Produktionsreife
 
 Stand: 21.11.2026  
-Status: Arbeitsplan; keine Behauptung einer abgeschlossenen Implementierung.
+Status: technischer Arbeitsplan; Funktionen gelten erst nach Live-Test als fertig.
 
 ## 1. Bestand (im Repository geprüft)
 
@@ -11,36 +11,36 @@ Bereits vorhanden:
 - Eingaben für Verbrauch, Dachfläche, Ausrichtung, Neigung, Verschattung, Strompreis, Einspeisevergütung und Speicher
 - automatische Modellrechnung
 - Druckansicht für PDF sowie CSV-Export
-- GitHub Actions mit Quellcode-Validierung und GitHub-Pages-Deployment
+- GitHub Pages Deployment
 
 Aktuelle fachliche Grenzen:
 - Der standortbezogene Ertrag wird aus Open-Meteo-Strahlungsdaten und einem pauschalen Faktor abgeleitet; das ist keine PVGIS-Systemsimulation.
 - Die Monatsproduktion wird nicht ausgewiesen.
 - Der Eigenverbrauch wird aus einer vereinfachten Jahresquote abgeleitet; ein stündliches Lastprofil und eine zeitliche Speicher-Simulation fehlen.
 - Die Amortisation ist eine einfache Division von Investition durch jährlichen Nutzen; laufende Kosten, Degradation, Ersatzinvestitionen, Finanzierung und Preisentwicklung fehlen.
-- Die aktuelle Flächen-/Gebäudeerkennung vermisst kein Dach. Der 65-%-Wert bleibt eine unverbindliche Startannahme.
+- Die Gebäudegrundriss-Erkennung vermisst kein Dach. Der 65-%-Wert bleibt eine unverbindliche Startannahme.
 
-## 2. Zielbild
+## 2. Technische Voraussetzung für PVGIS
 
-Ein neutraler, kostenloser PV-Vorrechner für Wohngebäude in Deutschland, der:
-1. Standort und Dachparameter nachvollziehbar erfasst;
-2. PVGIS-Ertragsdaten mit sichtbarer Quelle und Parametern verwendet;
-3. Jahres- und Monatswerte ausweist;
-4. Eigenverbrauch, Einspeisung und Speicher als Modellannahmen transparent trennt;
-5. Wirtschaftlichkeit als Szenario statt als Renditeversprechen darstellt;
-6. einen verständlichen PDF-/CSV-Bericht erzeugt;
-7. ohne fingierte Installateure, Kunden, Bewertungen oder Referenzen auskommt.
+Die offizielle JRC-Dokumentation bestätigt:
+- PVGIS 5.3 stellt den PVcalc-Endpunkt unter /api/v5_3/PVcalc bereit.
+- PVcalc liefert Jahres- und Monatswerte für netzgekoppelte PV-Anlagen.
+- Direkte AJAX-Aufrufe an PVGIS aus dem Browser sind ausdrücklich nicht erlaubt.
+
+Daraus folgt: Der statische GitHub-Pages-Client darf PVGIS nicht direkt aufrufen. Vor der UI-Integration muss ein eigener serverseitiger Proxy bereitgestellt werden (z. B. ein kostenloser Worker-Endpunkt). Der Client ruft danach ausschließlich diesen eigenen Proxy auf. Solange der Proxy nicht deployed und getestet ist, bleibt die vorhandene Open-Meteo-Schätzung aktiv und wird nicht als PVGIS ausgegeben.
 
 ## 3. Umsetzung in Arbeitspaketen
 
-### A — PVGIS-Ertragsmodell
-- PVGIS API v5.3 PVcalc-Endpunkt integrieren.
-- Standortkoordinaten, installierte Leistung, Systemverluste, Neigung und Azimut explizit übergeben.
-- Azimut-Konvention dokumentieren und die UI-Auswahl eindeutig darauf abbilden.
-- Jahreswert E_y sowie monatliche E_m-Werte aus der PVGIS-Antwort übernehmen.
-- Quelle, API-Version, Abrufdatum, Koordinaten und verwendete Parameter im Ergebnisbericht anzeigen.
-- Bei API-Ausfall keinen PVGIS-Wert vortäuschen: Fallback klar als vereinfachte Schätzung markieren.
-- Eingaben validieren und API-Fehler / Zeitüberschreitungen nutzerverständlich behandeln.
+### A — PVGIS-Proxy und Ertragsmodell
+- Serverlosen Proxy mit fester PVGIS-Upstream-Adresse bereitstellen.
+- Nur erforderliche Parameter akzeptieren: Koordinaten, Neigung und Azimut.
+- Wertebereiche serverseitig validieren; Peakpower und Systemverluste als kontrollierte Modellparameter setzen.
+- CORS ausschließlich für die tatsächliche Rechner-Domain erlauben; keine Wildcard-Freigabe.
+- Fehler, Timeouts und Rate-Limits kontrolliert behandeln; Antworten kurzzeitig cachen.
+- PVGIS 5.3 JSON-Antwort mit Jahreswert E_y und zwölf Monatswerten E_m validieren.
+- Azimut-Konvention dokumentieren: 0° Süd, +90° West, -90° Ost.
+- Quelle, API-Version, Abrufdatum, Koordinaten und verwendete Parameter im Bericht ausweisen.
+- Fallback nur als vereinfachte Schätzung kennzeichnen.
 
 ### B — Monatliche Energiebilanz
 - Monatsproduktion in kWh anzeigen.
@@ -63,16 +63,17 @@ Ein neutraler, kostenloser PV-Vorrechner für Wohngebäude in Deutschland, der:
 
 ### E — Qualität / Freigabe
 - Unit-Tests für Größenbegrenzung, Ertrag, Eigenverbrauch, Einspeisung, Kosten und Grenzfälle.
-- API-Antworten mit gültigen und ungültigen Beispielen testen.
+- Proxy-Tests für gültige Parameter, ungültige Koordinaten, Upstream-Fehler, Timeout und CORS.
 - Browser-Tests für Standortsuche, manuelle Eingaben, PDF-Druck und CSV-Export.
 - Mobilansicht und Tastaturbedienung prüfen.
-- GitHub Actions muss Tests und Syntaxprüfung vor Deployment ausführen.
+- GitHub Actions muss Syntaxprüfung und Tests vor Deployment ausführen.
 - Nach Deployment Live-URL, HTTP-Erreichbarkeit und Kernfunktionen tatsächlich prüfen.
 
 ## 4. Freigabekriterien
 
-Die Anwendung darf erst als verkaufsfähiges Produkt bezeichnet werden, wenn:
-- PVGIS-Integration im Live-Build nachweislich funktioniert;
+Die Anwendung darf erst als verkaufsfähig bezeichnet werden, wenn:
+- PVGIS-Proxy deployed und erreichbar ist;
+- PVGIS-Jahres- und Monatswerte nachweislich geladen werden;
 - Monats- und Jahreswerte reproduzierbar sind;
 - die verwendeten Annahmen im UI und Bericht sichtbar sind;
 - Tests automatisiert laufen und erfolgreich sind;
@@ -84,15 +85,15 @@ Die Anwendung darf erst als verkaufsfähiges Produkt bezeichnet werden, wenn:
 
 - Keine erfundenen Daten, Kunden, Partner, Bewertungen oder Testergebnisse.
 - Keine versteckten Kosten und keine irreführenden Versprechen.
-- Keine Übermittlung der Verbrauchs- und Kosteneingaben an externe Dienste, sofern dafür keine ausdrücklich erklärte Funktion erforderlich ist.
+- Keine Übermittlung von Verbrauchs- und Kosteneingaben an externe Dienste.
 - Standort- und API-Datenübertragung transparent erklären.
 - Markenneutral bleiben.
 - Eine Schätzung klar als Schätzung kennzeichnen.
 
 ## 6. Nächste technische Reihenfolge
 
-1. PVGIS-Parameter und Azimut-Mapping implementieren.
-2. PVGIS-Jahres- und Monatsdaten in UI und Bericht integrieren.
+1. Serverseitigen PVGIS-Proxy bereitstellen und testen.
+2. PVGIS-Jahres- und Monatsdaten in UI, CSV und PDF integrieren.
 3. Modell für Verbrauch, Speicher und Wirtschaftlichkeit präzisieren.
-4. automatisierte Tests ergänzen.
-5. Pull Request prüfen, mergen und erst danach Live-Version validieren.
+4. automatisierte Tests und CI ergänzen.
+5. PRs prüfen, mergen und erst danach Live-Version validieren.
