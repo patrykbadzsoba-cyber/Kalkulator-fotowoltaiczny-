@@ -187,13 +187,19 @@ async function loadSolarEstimate(lat, lon, label) {
         const expectedDays = new Date(Number(yearLabel), month + 1, 0).getDate();
         return count >= Math.ceil(expectedDays * 0.75);
       })
-    ).map(([, year]) => year);
+    );
     if (completeYears.length < 3) {
       throw new Error("Es liegen weniger als drei vollständige Jahre mit ausreichenden Strahlungsdaten vor.");
     }
     const avgAnnualKwhM2 = completeYears.reduce((sum, year) => sum + year.totalMj, 0) / completeYears.length / 3.6;
+    // Scale each accepted month's observed radiation to the full calendar month.
+    // This prevents up to 25% missing daily observations from shifting the
+    // seasonal profile toward months with better data coverage.
     monthlyRadiationProfile = Array.from({length: 12}, (_, month) =>
-      completeYears.reduce((sum, year) => sum + year.monthlyMj[month], 0) / completeYears.length
+      completeYears.reduce((sum, [yearLabel, year]) => {
+        const expectedDays = new Date(Number(yearLabel), month + 1, 0).getDate();
+        return sum + year.monthlyMj[month] * expectedDays / year.monthlyDays[month];
+      }, 0) / completeYears.length
     );
     localYieldPerKwp = Math.max(650, Math.min(1250, avgAnnualKwhM2 * 0.80));
     locationStatus.textContent = "Standort und lokale Klimadaten geladen. Verwendet werden " + completeYears.length + " vollständige Kalenderjahre aus dem Zeitraum 2021–2025.";
