@@ -34,6 +34,8 @@ let selectedLocation = null;
 let localYieldPerKwp = 950;
 let monthlyRadiationProfile = null;
 let locationRequest = 0;
+let locationMap = null;
+let locationMarker = null;
 const monthLabels = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
 
 function clearResults() {
@@ -145,6 +147,14 @@ async function loadSolarEstimate(lat, lon, label) {
   const requestId = ++locationRequest;
   monthlyRadiationProfile = null;
   selectedLocation = { lat, lon, name: label };
+  if (locationMap && window.L) {
+    const point = [Number(lat), Number(lon)];
+    if (locationMarker) locationMarker.setLatLng(point);
+    else locationMarker = L.marker(point).addTo(locationMap);
+    locationMarker.bindPopup(label).openPopup();
+    locationMap.setView(point, Math.max(locationMap.getZoom(), 13));
+    el("map-status").textContent = "Ausgewählter Punkt: " + Number(lat).toFixed(5) + ", " + Number(lon).toFixed(5) + ". Für die Dachfläche bitte die Angaben prüfen.";
+  }
   findNearbyBuildings(lat, lon);
   localYieldPerKwp = 950;
   locationStatus.textContent = "Standort erkannt. Lokale Sonneneinstrahlung wird geladen …";
@@ -405,3 +415,22 @@ async function findNearbyBuildings(lat, lon) {
     buildingStatus.textContent = "Gebäudeabfrage fehlgeschlagen: " + (error.message || "Unbekannter Fehler") + " Bitte Dachfläche manuell eintragen.";
   }
 }
+
+
+function initLocationMap() {
+  const mapStatus = el("map-status");
+  if (!window.L || !el("location-map")) {
+    mapStatus.textContent = "Die Kartenbibliothek konnte nicht geladen werden. Du kannst weiterhin Ort oder Postleitzahl suchen oder deinen Standort verwenden.";
+    return;
+  }
+  locationMap = L.map("location-map", { scrollWheelZoom: false }).setView([51.1657, 10.4515], 6);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(locationMap);
+  locationMap.on("click", event => {
+    loadSolarEstimate(event.latlng.lat, event.latlng.lng, "Manuell gewählter Kartenpunkt");
+  });
+  mapStatus.textContent = "Karte bereit. Wähle einen Punkt auf der Karte oder suche oben nach Stadt oder Postleitzahl.";
+}
+initLocationMap();
