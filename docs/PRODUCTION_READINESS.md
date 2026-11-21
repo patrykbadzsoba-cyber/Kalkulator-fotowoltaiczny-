@@ -36,7 +36,7 @@ Daraus folgt: Der statische GitHub-Pages-Client darf PVGIS nicht direkt aufrufen
 - Nur erforderliche Parameter akzeptieren: Koordinaten, Neigung und Azimut.
 - Wertebereiche serverseitig validieren; Peakpower und Systemverluste als kontrollierte Modellparameter setzen.
 - CORS ausschließlich für die tatsächliche Rechner-Domain erlauben; keine Wildcard-Freigabe.
-- Fehler, Timeouts und Rate-Limits kontrolliert behandeln; Antworten kurzzeitig cachen.
+- Upstream-Fehler und Timeouts kontrolliert behandeln; Antworten kurzzeitig cachen. Rate-Limits müssen zusätzlich auf der Hosting-Ebene konfiguriert werden.
 - PVGIS 5.3 JSON-Antwort mit Jahreswert E_y und zwölf Monatswerten E_m validieren.
 - Azimut-Konvention dokumentieren: 0° Süd, +90° West, -90° Ost.
 - Quelle, API-Version, Abrufdatum, Koordinaten und verwendete Parameter im Bericht ausweisen.
