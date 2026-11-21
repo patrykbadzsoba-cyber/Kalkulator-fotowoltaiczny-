@@ -80,7 +80,7 @@ function calculate() {
   const {
     maxRoofCapacity, requestedCapacity, capacity, annualYield, selfConsumed,
     exported, gridCoverage, selfConsumptionSavings, feedInRevenue,
-    annualSavings, investment, payback, panels, roofLimited
+    annualSavings, investment, payback, panels
   } = estimate;
 
   el("system-size").innerHTML = capacity.toLocaleString("de-DE", {maximumFractionDigits: 2}) + ' <small>kWp</small>';
