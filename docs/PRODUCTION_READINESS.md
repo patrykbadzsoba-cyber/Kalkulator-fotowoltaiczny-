@@ -14,7 +14,7 @@ Der aktuelle Quellcode enthält bereits:
 - optionale Weiterleitung zu einer Partner-Kontaktseite über HTTPS-URL-Parameter.
 - unverbindliche OpenStreetMap-Gebäudegrundrisssuche in der Nähe des ausgewählten Punkts.
 
-Wichtig: Die Standortsuche und Geolokalisierung sind vorhanden, aber es gibt derzeit keine interaktive Kartenoberfläche mit frei verschiebbarem Kartenmarker. Der Gebäudegrundriss ist kein Dachaufmaß und darf nicht als bestätigte Dachfläche ausgegeben werden.
+Die Hauptversion enthält jetzt zusätzlich eine interaktive OpenStreetMap-Karte (Leaflet). Ein Klick auf die Karte setzt den Berechnungspunkt, verschiebt den Marker, lädt die lokalen Klimadaten und startet die Gebäudegrundrisssuche. Diese neue Karteninteraktion ist im Quellcode vorhanden, muss nach erfolgreichem Pages-Deploy aber noch im Browser auf Smartphone und Desktop geprüft werden. Der Marker bestätigt Koordinaten, keine hausnummerngenaue Adresse. Der Gebäudegrundriss ist kein Dachaufmaß und darf nicht als bestätigte Dachfläche ausgegeben werden.
 
 ## 2. Fachliche Grenzen
 
@@ -97,5 +97,5 @@ Die Anwendung darf erst als vollständig produktionsreif oder als PVGIS-basiert 
 1. Einen neuen erfolgreichen Pages-Workflow auf dem aktuellen `main` erzielen und die öffentliche URL verifizieren.
 2. Cloudflare-Secrets und `workers.dev`-Subdomain prüfen; Worker deployen und die URL ermitteln.
 3. Worker-URL in die Frontend-Konfiguration integrieren; PVGIS-Jahres- und Monatswerte nur nach erfolgreichem Live-Test verwenden.
-4. Interaktive Kartenwahl und Adress-/Standortbestätigung ergänzen, falls die Nutzerführung dies erfordert.
+4. Neue interaktive Kartenwahl nach erfolgreichem Pages-Deploy auf Smartphone und Desktop testen; hausnummerngenaue Adressbestätigung ist weiterhin nicht implementiert.
 5. Browser-End-to-End-Tests und rechtliche Betreiberangaben abschließen.
