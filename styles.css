@@ -100,3 +100,8 @@ footer{border-top-color:#3b5574;color:#a9bad0}
 .assumption-box p{line-height:1.7}.disclaimer{margin-top:16px}#location-map{outline:1px solid #35e0d055}
 @media(max-width:540px){.hero h1{font-size:clamp(34px,10vw,42px)}.input-panel,.results-panel{padding:17px}.metrics-grid{gap:8px}.metric{padding:12px}.metric strong{font-size:18px}.assumption-box{padding:14px}.disclaimer{font-size:11px;margin-top:14px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+.methodology-box{margin-top:16px;padding:16px 17px;border:1px solid #a78bfa88;border-radius:12px;background:linear-gradient(120deg,#a78bfa18,#35e0d012)}
+.methodology-box strong{display:block;margin-bottom:7px;color:#d2c5ff;font:700 13px Manrope,sans-serif}
+.methodology-box p{margin:7px 0 0;color:#c4d0df;font-size:11px;line-height:1.7}
+@media print{.methodology-box{background:#fff!important;border:1px solid #999}.methodology-box strong,.methodology-box p{color:#222!important}}
