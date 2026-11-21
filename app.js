@@ -139,7 +139,7 @@ async function loadSolarEstimate(lat, lon, label) {
     const avgAnnualKwhM2 = annualMj.reduce((a,b)=>a+b,0) / annualMj.length / 3.6;
     localYieldPerKwp = Math.max(650, Math.min(1250, avgAnnualKwhM2 * 0.80));
     locationStatus.textContent = "Standort und lokale Klimadaten geladen. Die Berechnung verwendet den Mittelwert der Jahre 2021–2025.";
-    locationDetails.textContent = label + " · " + Number(lat).toFixed(4) + "° N, " + Number(lon).toFixed(4) + "° E · geschätzter Ertrag: " + number.format(localYieldPerKwp) + " kWh/kWp/Jahr.";
+    locationDetails.textContent = label + " · " + Math.abs(Number(lat)).toFixed(4) + "° " + (lat >= 0 ? "N" : "S") + ", " + Math.abs(Number(lon)).toFixed(4) + "° " + (lon >= 0 ? "E" : "W") + " · geschätzter Ertrag: " + number.format(localYieldPerKwp) + " kWh/kWp/Jahr.";
     locationDetails.hidden = false;
   } catch (error) {
     if (requestId !== locationRequest) return;
