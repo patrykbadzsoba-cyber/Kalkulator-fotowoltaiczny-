@@ -6,6 +6,8 @@ const errorBox = el("calc-error");
 const resultsPanel = document.querySelector(".results-panel");
 const locationStatus = el("location-status");
 const locationDetails = el("location-details");
+const buildingStatus = el("building-status");
+const buildingResults = el("building-results");
 const searchButton = el("location-search-button");
 const locateButton = el("locate-button");
 const partnerCta = el("partner-cta");
@@ -108,6 +110,7 @@ function calculate() {
 async function loadSolarEstimate(lat, lon, label) {
   const requestId = ++locationRequest;
   selectedLocation = { lat, lon, name: label };
+  findNearbyBuildings(lat, lon);
   localYieldPerKwp = 950;
   locationStatus.textContent = "Standort erkannt. Lokale Sonneneinstrahlung wird geladen …";
   locationDetails.hidden = true;
@@ -255,3 +258,80 @@ el("print-report").addEventListener("click", () => {
 });
 el("export-csv").addEventListener("click", exportResultsCsv);
 calculate();
+
+// OpenStreetMap building footprints: discovery aid, not a roof survey.
+// A footprint is never treated as measured roof area; the user must explicitly apply
+// a conservative 65% starting estimate and can edit it afterwards.
+function polygonAreaM2(points) {
+  if (!Array.isArray(points) || points.length < 3) return 0;
+  const lat0 = points.reduce((sum, p) => sum + p.lat, 0) / points.length;
+  const metersPerLat = 111132;
+  const metersPerLon = 111320 * Math.cos(lat0 * Math.PI / 180);
+  const xy = points.map(p => ({ x: p.lon * metersPerLon, y: p.lat * metersPerLat }));
+  let area = 0;
+  for (let i = 0; i < xy.length; i++) {
+    const j = (i + 1) % xy.length;
+    area += xy[i].x * xy[j].y - xy[j].x * xy[i].y;
+  }
+  return Math.abs(area / 2);
+}
+function distanceMeters(lat1, lon1, lat2, lon2) {
+  const rad = Math.PI / 180;
+  const x = (lon2 - lon1) * rad * Math.cos((lat1 + lat2) * rad / 2);
+  const y = (lat2 - lat1) * rad;
+  return Math.sqrt(x*x + y*y) * 6371000;
+}
+async function findNearbyBuildings(lat, lon) {
+  buildingStatus.textContent = "Kartierte Gebäude werden in der Umgebung gesucht …";
+  buildingResults.replaceChildren();
+  const query = '[out:json][timeout:20];way(around:60,' + Number(lat) + ',' + Number(lon) + ')["building"];out tags geom;';
+  try {
+    const endpoint = "https://overpass-api.de/api/interpreter?data=" + encodeURIComponent(query);
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error("OpenStreetMap/Overpass antwortet derzeit nicht.");
+    const data = await response.json();
+    const candidates = (data.elements || []).map(item => {
+      const points = (item.geometry || []).map(p => ({lat:p.lat, lon:p.lon}));
+      if (points.length > 2 && points[0].lat === points[points.length-1].lat && points[0].lon === points[points.length-1].lon) points.pop();
+      const area = polygonAreaM2(points);
+      const center = points.length ? {
+        lat: points.reduce((s,p)=>s+p.lat,0)/points.length,
+        lon: points.reduce((s,p)=>s+p.lon,0)/points.length
+      } : null;
+      return { id:item.id, tags:item.tags || {}, area, center };
+    }).filter(b => b.area >= 15 && b.center)
+      .map(b => ({...b, distance:distanceMeters(lat,lon,b.center.lat,b.center.lon)}))
+      .filter(b => b.distance <= 60)
+      .sort((a,b)=>a.distance-b.distance)
+      .slice(0,8);
+    if (!candidates.length) {
+      buildingStatus.textContent = "In 60 m Umgebung wurde kein geeigneter Gebäudegrundriss gefunden. Bitte prüfe die Adresse oder gib die Dachfläche manuell ein.";
+      return;
+    }
+    buildingStatus.textContent = candidates.length + " kartierte Gebäude gefunden. Wähle nur dann eines aus, wenn es tatsächlich dein Haus ist.";
+    for (const building of candidates) {
+      const card = document.createElement("article");
+      card.className = "building-card";
+      const heading = document.createElement("strong");
+      heading.textContent = (building.tags.name || building.tags["addr:housenumber"] || "Gebäude") + " · " + Math.round(building.area) + " m² Grundfläche";
+      const detail = document.createElement("p");
+      const roofTags = [building.tags["roof:shape"], building.tags["roof:angle"] ? "Dachwinkel " + building.tags["roof:angle"] + "°" : "", building.tags["roof:direction"] ? "Dachrichtung " + building.tags["roof:direction"] : ""].filter(Boolean);
+      detail.textContent = "Etwa " + Math.round(building.distance) + " m vom gewählten Punkt" + (roofTags.length ? " · Kartierte Dachmerkmale: " + roofTags.join(", ") : " · Keine verlässlichen Dachmerkmale kartiert");
+      const apply = document.createElement("button");
+      apply.type = "button";
+      apply.className = "building-apply";
+      apply.textContent = "65 % als vorläufige nutzbare Fläche übernehmen (" + Math.max(6, Math.round(building.area * 0.65)) + " m²)";
+      apply.addEventListener("click", () => {
+        el("roof-area").value = Math.max(6, Math.min(500, Math.round(building.area * 0.65)));
+        calculate();
+        buildingStatus.textContent = "Vorläufiger Flächenwert übernommen. Bitte Dachfläche anhand von Plänen oder Messung prüfen.";
+        apply.textContent = "Flächenwert übernommen";
+        apply.disabled = true;
+      });
+      card.append(heading, detail, apply);
+      buildingResults.append(card);
+    }
+  } catch (error) {
+    buildingStatus.textContent = "Gebäudeabfrage fehlgeschlagen: " + (error.message || "Unbekannter Fehler") + " Bitte Dachfläche manuell eintragen.";
+  }
+}
