@@ -12,3 +12,17 @@
 .partner-cta{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:18px 0;padding:17px;border:1px solid #c7f36b66;border-radius:12px;background:#c7f36b0d}.partner-cta[hidden]{display:none}.partner-cta strong{font:700 14px Manrope,sans-serif;color:var(--lime)}.partner-cta p{font-size:11px;color:var(--muted);margin:4px 0 0}.partner-cta a{display:inline-flex;align-items:center;justify-content:center;gap:10px;flex:none;padding:12px 15px;border-radius:8px;background:var(--lime);color:#15212a;text-decoration:none;font-size:12px;font-weight:700}.partner-cta a:hover{filter:brightness(1.06)}@media(max-width:540px){.partner-cta{align-items:stretch;flex-direction:column}.partner-cta a{width:100%}}
 
 .location-privacy{grid-column:1/-1;margin:0;font-size:10px;line-height:1.5;color:#899b9c}
+
+.report-actions{display:flex;gap:9px;flex-wrap:wrap;margin:16px 0 0}
+.report-actions button{min-height:40px;padding:0 13px;border:0;border-radius:8px;background:var(--lime);color:#15212a;font:700 11px 'DM Sans',sans-serif;cursor:pointer}
+.report-actions button.secondary{background:#263943;color:var(--cyan);border:1px solid #6dd8d055}
+@media print{
+  :root{color-scheme:light}body{background:#fff!important;color:#17232d!important;font-size:11pt}
+  .site-header,.hero,.input-panel,.location-controls,.location-privacy,footer,.report-actions,.primary-link{display:none!important}
+  main{max-width:none;padding:0}.calculator-section{border:0;padding:0}.section-heading{text-align:left;margin:0 0 16px}
+  .location-panel,.results-panel{background:#fff!important;color:#17232d!important;border:1px solid #bbb;box-shadow:none;break-inside:avoid}
+  .location-copy p:last-child,.location-status,.location-details,.metric span,.metric small,.main-result>span,.main-result p,.assumption-box p,.disclaimer{color:#444!important}
+  .main-result,.metric,.assumption-box{background:#fff!important;border:1px solid #bbb!important}
+  .main-result strong,.metric strong,.assumption-box strong,.results-top h3{color:#17232d!important}
+  .metrics-grid{grid-template-columns:1fr 1fr}.disclaimer{font-size:8pt}
+}
