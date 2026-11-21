@@ -7,6 +7,8 @@
   <meta name="description" content="Kostenloser, markenunabhängiger Photovoltaik-Rechner für Eigenheime in Deutschland.">
   <title>PV-Rechner Deutschland – unabhängig & kostenlos</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
   <script src="pv-model.js" defer></script>
   <script src="app.js" defer></script>
 </head>
@@ -42,6 +44,11 @@
           <input id="location-search" type="search" placeholder="Ort oder PLZ, z. B. Hamburg" autocomplete="postal-code">
           <button id="location-search-button" type="button" class="location-button">Standort suchen</button>
           <button id="locate-button" type="button" class="location-button secondary">Meinen Standort verwenden</button>
+        </div>
+        <div class="map-wrap">
+          <div class="map-heading"><strong>Standort auf der Karte auswählen</strong><span>Tippe auf die Karte, um den Berechnungspunkt festzulegen.</span></div>
+          <div id="location-map" role="application" aria-label="Karte zur Auswahl des PV-Standorts"></div>
+          <p id="map-status" class="map-status" aria-live="polite">Karte wird geladen …</p>
         </div>
         <p id="location-status" class="location-status" role="status" aria-live="polite">Noch kein Standort gewählt. Ohne Standort wird mit einem allgemeinen Richtwert gerechnet.</p>
         <p id="location-details" class="location-details" hidden></p>
