@@ -35,10 +35,15 @@ jobs:
           node --check pv-model.js
           node --check app.js
           node --test
-      - name: Upload site
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
-        with:
-          path: .
+      - name: Archive Pages site
+        run: |
+          tar --dereference --hard-dereference --directory "$GITHUB_WORKSPACE" \
+            -cvf "$RUNNER_TEMP/artifact.tar" \
+            --exclude=.git --exclude=.github .
+      - name: Upload Pages artifact without a blocked third-party action
+        run: |
+          npm install --no-save --no-package-lock @actions/artifact@2
+          node .github/scripts/upload-pages-artifact.cjs
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
