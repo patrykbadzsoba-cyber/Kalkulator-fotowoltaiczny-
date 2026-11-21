@@ -1,0 +1,12 @@
+name: Diagnose GitHub Actions startup
+on:
+  push:
+    branches: ["main"]
+permissions:
+  contents: read
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm runner starts
+        run: echo "GitHub Actions runner started successfully"
