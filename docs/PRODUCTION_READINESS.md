@@ -97,3 +97,19 @@ Die Anwendung darf erst als verkaufsfähig bezeichnet werden, wenn:
 3. Modell für Verbrauch, Speicher und Wirtschaftlichkeit präzisieren.
 4. automatisierte Tests und CI ergänzen.
 5. PRs prüfen, mergen und erst danach Live-Version validieren.
+
+## 7. Cloudflare Worker deployment
+
+The repository now contains `wrangler.toml` and a GitHub Actions deployment workflow. The workflow deploys the Worker only after changes reach `main`; it does not run for pull requests.
+
+One-time account setup required (cannot be performed by a GitHub repository token):
+1. In Cloudflare, create an API token with **Workers Scripts: Edit** permission for the target account.
+2. Copy the Cloudflare account ID from the account overview.
+3. In GitHub repository Settings → Secrets and variables → Actions, add:
+   - `CLOUDFLARE_API_TOKEN` — the token (secret).
+   - `CLOUDFLARE_ACCOUNT_ID` — the account ID (secret).
+4. In Cloudflare, ensure the account's `workers.dev` subdomain is enabled.
+
+The Worker is configured to allow only the calculator origin `https://patrykbadzsoba-cyber.github.io`. After deployment, Cloudflare will provide the Worker URL in the Actions log. The frontend must not be switched to PVGIS until that URL is known and live CORS, upstream response, and monthly data have been tested.
+
+No token, account ID, or other credential should be committed to the repository.
