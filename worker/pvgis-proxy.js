@@ -23,7 +23,7 @@ function json(data, status, origin) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const allowedOrigin = env.APP_ORIGIN;
     const requestOrigin = request.headers.get("Origin");
     if (!allowedOrigin || requestOrigin !== allowedOrigin) {
@@ -68,6 +68,15 @@ export default {
     }).toString();
 
     try {
+      const cache = caches.default;
+      const cacheKey = new Request(upstream.toString(), { method: "GET" });
+      const cached = await cache.match(cacheKey);
+      if (cached) {
+        const headers = new Headers(cached.headers);
+        headers.set("access-control-allow-origin", allowedOrigin);
+        headers.set("vary", "Origin");
+        return new Response(cached.body, { status: cached.status, headers });
+      }
       const response = await fetch(upstream.toString(), {
         headers: { "accept": "application/json" },
         signal: AbortSignal.timeout(12000)
@@ -85,7 +94,7 @@ export default {
       if (!Number.isFinite(annual) || annual <= 0 || !Array.isArray(monthly) || monthly.length !== 12) {
         return json({ error: "Incomplete PVGIS response" }, 502, allowedOrigin);
       }
-      return new Response(JSON.stringify(payload), {
+      const result = new Response(JSON.stringify(payload), {
         status: 200,
         headers: {
           "content-type": "application/json; charset=utf-8",
@@ -94,6 +103,8 @@ export default {
           "cache-control": "public, max-age=3600"
         }
       });
+      ctx.waitUntil(cache.put(cacheKey, result.clone()));
+      return result;
     } catch (_) {
       return json({ error: "PVGIS request failed or timed out" }, 502, allowedOrigin);
     }
