@@ -161,7 +161,7 @@ async function loadSolarEstimate(lat, lon, label) {
   locationDetails.hidden = true;
   calculate();
   // Auf Mobilgeräten das Ergebnis direkt nach der Standortwahl sichtbar machen.
-  resultsPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  resultsPanel.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
   try {
     const start = "2021-01-01";
     const end = "2025-12-31";
