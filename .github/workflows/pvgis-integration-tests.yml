@@ -1,0 +1,48 @@
+name: Validate PVGIS integration
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "app.js"
+      - "index.html"
+      - "pvgis-*.js"
+      - "worker/**"
+      - "tests/**"
+      - "wrangler.toml"
+      - ".github/workflows/pvgis-integration-tests.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "app.js"
+      - "index.html"
+      - "pvgis-*.js"
+      - "worker/**"
+      - "tests/**"
+      - "wrangler.toml"
+      - ".github/workflows/pvgis-integration-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check frontend JavaScript syntax
+        run: |
+          node --check app.js
+          node --check pv-model.js
+          node --check pvgis-client.js
+          node --check pvgis-config.js
+          node --check quantum-engine.js
+      - name: Check Cloudflare Worker module syntax
+        run: node --input-type=module --check < worker/pvgis-proxy.js
+      - name: Run model, client and Worker tests
+        run: node --test tests/*.test.js
