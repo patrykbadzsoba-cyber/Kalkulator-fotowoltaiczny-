@@ -354,7 +354,7 @@ form.addEventListener("reset", () => {
   // Re-fetch PVGIS after the reset so results match the restored roof angles.
   setTimeout(() => {
     calculate();
-    if (selectedLocation && solarSource === "pvgis" && window.PVGIS_PROXY_URL) {
+    if (selectedLocation && ["pvgis", "pending"].includes(solarSource) && window.PVGIS_PROXY_URL) {
       refreshPvgisForConfiguration();
     }
   }, 0);
