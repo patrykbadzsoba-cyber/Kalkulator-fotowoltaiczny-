@@ -98,8 +98,8 @@ export default {
       if (!Number.isFinite(annual) || annual <= 0 || !Array.isArray(monthlyRows) || monthlyRows.length !== 12) {
         return json({ error: "Incomplete PVGIS response" }, 502, allowedOrigin);
       }
-      const monthly = monthlyRows.map(row => Number(row?.E_m));
-      if (monthly.some(value => !Number.isFinite(value) || value < 0)) {
+      const monthly = monthlyRows.map(row => row?.E_m === null || row?.E_m === undefined || row?.E_m === "" ? NaN : Number(row.E_m));
+      if (monthly.some(value => !Number.isFinite(value) || value < 0) || monthly.reduce((sum, value) => sum + value, 0) <= 0) {
         return json({ error: "Invalid PVGIS monthly values" }, 502, allowedOrigin);
       }
       return json({
