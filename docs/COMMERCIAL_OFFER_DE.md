@@ -29,7 +29,7 @@ Der Rechner ist herstellerneutral und benötigt kein Benutzerkonto. Die Berechnu
 
 ## Was ausdrücklich noch nicht angeboten wird
 
-- Keine produktiv bestätigte PVGIS-Integration. Ein Cloudflare-Worker ist vorbereitet, aber seine Live-Bereitstellung, URL und Frontend-Anbindung sind noch nicht bestätigt.
+- Noch keine produktiv bestätigten PVGIS-Ergebnisse. Der Frontend-Client ist integriert und kann PVGIS 5.3 nutzen, sobald der Cloudflare-Worker veröffentlicht und seine echte HTTPS-URL in `pvgis-config.js` eingetragen ist. Der letzte Worker-Deploy scheiterte an fehlenden GitHub Actions Secrets; bis zur erfolgreichen Live-Prüfung bleibt die Open-Meteo-Schätzung aktiv.
 - Keine stündliche Simulation des Haushaltsverbrauchs oder der Speichersteuerung.
 - Keine Dachvermessung, Statikprüfung, Verschattungsanalyse oder verbindliche Anlagenplanung.
 - Keine automatische Lead-Übermittlung, kein CRM, keine Lead-Zählung und keine Conversion-Statistik.
