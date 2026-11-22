@@ -1,11 +1,12 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { readFile } = require("node:fs/promises");
+const path = require("node:path");
 
 let workerModule;
 async function getWorker() {
   if (!workerModule) {
-    const source = await readFile(new URL("../worker/pvgis-proxy.js", import.meta.url), "utf8");
+    const source = await readFile(path.join(process.cwd(), "worker/pvgis-proxy.js"), "utf8");
     workerModule = import("data:text/javascript;base64," + Buffer.from(source).toString("base64"));
   }
   return workerModule;
