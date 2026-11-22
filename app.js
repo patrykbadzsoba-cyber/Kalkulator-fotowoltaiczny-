@@ -349,7 +349,16 @@ locateButton.addEventListener("click", () => {
 });
 form.addEventListener("input", calculate);
 form.addEventListener("change", calculate);
-form.addEventListener("reset", () => setTimeout(calculate, 0));
+form.addEventListener("reset", () => {
+  // The browser restores select values without dispatching change events.
+  // Re-fetch PVGIS after the reset so results match the restored roof angles.
+  setTimeout(() => {
+    calculate();
+    if (selectedLocation && solarSource === "pvgis" && window.PVGIS_PROXY_URL) {
+      refreshPvgisForConfiguration();
+    }
+  }, 0);
+});
 async function refreshPvgisForConfiguration() {
   if (!selectedLocation || !["pvgis", "pending"].includes(solarSource) || !window.PVGIS_PROXY_URL) return;
   const requestId = ++locationRequest;
