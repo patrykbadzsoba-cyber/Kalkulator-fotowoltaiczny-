@@ -20,4 +20,6 @@ test("validates the annual and twelve monthly PVGIS values", () => {
   assert.equal(parsed.monthlyYieldKwhPerKwp.length, 12);
   assert.throws(() => PVGISClient.parseResponse({ annualYieldKwhPerKwp: 0, monthlyYieldKwhPerKwp: Array(12).fill(80) }), TypeError);
   assert.throws(() => PVGISClient.parseResponse({ annualYieldKwhPerKwp: 1050, monthlyYieldKwhPerKwp: Array(11).fill(80) }), TypeError);
+  assert.throws(() => PVGISClient.parseResponse({ annualYieldKwhPerKwp: 1050, monthlyYieldKwhPerKwp: Array(12).fill(0) }), TypeError);
+  assert.throws(() => PVGISClient.parseResponse({ annualYieldKwhPerKwp: 1050, monthlyYieldKwhPerKwp: [null, ...Array(11).fill(80)] }), TypeError);
 });
