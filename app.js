@@ -177,7 +177,9 @@ function renderMonthlyProduction(annualYield) {
     item.append(amount, track, label);
     container.append(item);
   });
-  el("monthly-status").textContent = "Verteilung aus historischen täglichen Globalstrahlungsdaten von Open-Meteo (2021–2025), gemittelt über vollständige Jahre und auf den geschätzten Jahresertrag skaliert. Kein PVGIS-Ergebnis und keine Ertragsgarantie.";
+  el("monthly-status").textContent = solarSource === "pvgis"
+    ? "Monatliche Ertragswerte aus PVGIS 5.3 für die gewählte Koordinate, Dachneigung und Dachausrichtung; auf die berechnete Anlagengröße skaliert. Keine Ertragsgarantie."
+    : "Verteilung aus historischen täglichen Globalstrahlungsdaten von Open-Meteo (2021–2025), gemittelt über vollständige Jahre und auf den geschätzten Jahresertrag skaliert. Kein PVGIS-Ergebnis und keine Ertragsgarantie.";
 }
 
 async function loadSolarEstimate(lat, lon, label) {
@@ -274,7 +276,8 @@ async function loadSolarEstimate(lat, lon, label) {
     );
     localYieldPerKwp = Math.max(650, Math.min(1250, avgAnnualKwhM2 * 0.80));
     window.PVAppLocalYield = localYieldPerKwp;
-    locationStatus.textContent = "Standort und lokale Klimadaten geladen. Verwendet werden " + completeYears.length + " vollständige Kalenderjahre aus dem Zeitraum 2021–2025.";
+    setSolarSourceStatus("open-meteo", pvgisFallbackReason ? "PVGIS-Fallback: " + pvgisFallbackReason : "PVGIS-Proxy nicht aktiviert");
+    locationStatus.textContent = (pvgisFallbackReason ? "PVGIS nicht verfügbar (" + pvgisFallbackReason + "). " : "") + "Standort und lokale Klimadaten geladen. Verwendet werden " + completeYears.length + " vollständige Kalenderjahre aus dem Zeitraum 2021–2025.";
     locationDetails.textContent = label + " · " + Math.abs(Number(lat)).toFixed(4) + "° " + (lat >= 0 ? "N" : "S") + ", " + Math.abs(Number(lon)).toFixed(4) + "° " + (lon >= 0 ? "E" : "W") + " · geschätzter Ertrag: " + number.format(localYieldPerKwp) + " kWh/kWp/Jahr.";
     locationDetails.hidden = false;
   } catch (error) {
@@ -282,6 +285,7 @@ async function loadSolarEstimate(lat, lon, label) {
     monthlyRadiationProfile = null;
     localYieldPerKwp = 950;
     window.PVAppLocalYield = localYieldPerKwp;
+    setSolarSourceStatus("default", "PVGIS und Open-Meteo nicht verfügbar");
     locationStatus.textContent = "Standort gespeichert, aber lokale Klimadaten sind gerade nicht erreichbar. Es wird vorläufig der allgemeine Richtwert verwendet.";
     locationDetails.textContent = label + " · " + Number(lat).toFixed(4) + "°, " + Number(lon).toFixed(4) + "° · 950 kWh/kWp/Jahr (allgemeiner Richtwert).";
     locationDetails.hidden = false;
