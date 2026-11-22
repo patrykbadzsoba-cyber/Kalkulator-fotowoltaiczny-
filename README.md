@@ -34,7 +34,7 @@ Wichtig: GitHub Actions kann den Pages-Dienst nicht selbst aktivieren, wenn GitH
 - Zahlen- und Währungsformat nach deutschem Gebietsschema
 - Anlagen- und Speicherpreise sind frei änderbare Beispielwerte, keine Marktpreis-Zusage
 
-Die Monatsverteilung wird nur angezeigt, wenn ausreichend historische tägliche Strahlungsdaten für mindestens drei vollständige Kalenderjahre geladen werden konnten. Sie verteilt den geschätzten Jahresertrag proportional zur mittleren monatlichen Globalstrahlung; sie ist keine separate PVGIS-Simulation. Die Berechnung ist eine erste Orientierung und ersetzt keine standortbezogene Ertragssimulation, Dachprüfung, Netzprüfung oder ein verbindliches Angebot. Verschattung, genaue Dachgeometrie, Standort, Anlagenverluste, Wechselrichter, Speicherwirkungsgrad, Lastprofil, Alterung, Wartung, Finanzierung, Steuern und gesetzliche Änderungen werden nicht vollständig modelliert.
+Wenn der PVGIS-Proxy aktiv ist, werden die PVGIS-Jahres- und Monatswerte für die ausgewählte Koordinate, Dachneigung und Dachausrichtung verwendet. Die Proxy-URL wird in `pvgis-config.js` gesetzt. Solange dort keine verifizierte HTTPS-Worker-URL eingetragen ist, verwendet der Rechner weiterhin die Open-Meteo-Schätzung. Die Monatsverteilung aus Open-Meteo wird nur angezeigt, wenn ausreichend historische tägliche Strahlungsdaten für mindestens drei vollständige Kalenderjahre geladen werden konnten. Sie verteilt den geschätzten Jahresertrag proportional zur mittleren monatlichen Globalstrahlung; sie ist keine separate PVGIS-Simulation. Die Berechnung ist eine erste Orientierung und ersetzt keine standortbezogene Ertragssimulation, Dachprüfung, Netzprüfung oder ein verbindliches Angebot. Verschattung, genaue Dachgeometrie, Standort, Anlagenverluste, Wechselrichter, Speicherwirkungsgrad, Lastprofil, Alterung, Wartung, Finanzierung, Steuern und gesetzliche Änderungen werden nicht vollständig modelliert.
 
 ## Partner-Modus für Installationsbetriebe
 
@@ -64,3 +64,8 @@ MIT. Siehe LICENSE.
 ## Gewerbliche Einrichtung für Installationsbetriebe
 
 Eine transparente B2B-Angebotsgrundlage mit Funktionsumfang, Grenzen, Lizenzhinweisen und Freigabekriterien steht in [`docs/COMMERCIAL_OFFER_DE.md`](docs/COMMERCIAL_OFFER_DE.md). Der aktuelle Stand ist noch nicht für einen uneingeschränkten kommerziellen Livebetrieb freigegeben; die offenen technischen und rechtlichen Punkte sind dort ausdrücklich dokumentiert.
+
+
+## PVGIS aktivieren
+
+Die einmalige Cloudflare-Konfiguration und die erforderlichen GitHub Actions Secrets sind in [`docs/PVGIS-AKTIVIERUNG.md`](docs/PVGIS-AKTIVIERUNG.md) beschrieben. Bis zum erfolgreichen Worker-Deploy und Live-Test bleibt die Open-Meteo-Schätzung aktiv.

@@ -34,11 +34,46 @@ let selectedLocation = null;
 let localYieldPerKwp = 950;
 window.PVAppLocalYield = localYieldPerKwp;
 let monthlyRadiationProfile = null;
+let solarSource = "default";
 let locationRequest = 0;
 let locationMap = null;
 let locationMarker = null;
 const monthLabels = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
 
+function setSolarSourceStatus(source, detail = "") {
+  solarSource = source;
+  const sourceLabel = source === "pvgis"
+    ? "PVGIS 5.3 – standortbezogene Systemberechnung"
+    : source === "open-meteo"
+      ? "Open-Meteo – historische Globalstrahlung, vereinfachtes Modell"
+      : source === "pending"
+        ? "Standortbezogene Solardaten werden geladen …"
+        : "Allgemeiner Richtwert – keine standortbezogene Simulation";
+  el("solar-source-status").textContent = "Datenquelle: " + sourceLabel + (detail ? " · " + detail : "");
+}
+function getPvgisAngles() {
+  const orientationOption = el("orientation").selectedOptions[0];
+  const tiltOption = el("tilt").selectedOptions[0];
+  const aspect = Number(orientationOption?.dataset.pvgisAspect);
+  const angle = Number(tiltOption?.dataset.pvgisAngle);
+  if (!Number.isFinite(aspect) || !Number.isFinite(angle)) {
+    throw new Error("Dachausrichtung oder Dachneigung ist nicht eindeutig für PVGIS konfiguriert.");
+  }
+  return { aspect, angle };
+}
+async function fetchPvgisEstimate(lat, lon) {
+  const proxy = window.PVGIS_PROXY_URL;
+  if (!proxy) return null;
+  const { aspect, angle } = getPvgisAngles();
+  const url = window.PVGISClient.buildRequest(proxy, lat, lon, angle, aspect);
+  const response = await fetch(url.toString(), { headers: { "Accept": "application/json" } });
+  if (!response.ok) {
+    let message = "PVGIS-Proxy antwortet mit HTTP " + response.status + ".";
+    try { message = (await response.json()).error || message; } catch (_) {}
+    throw new Error(message);
+  }
+  return window.PVGISClient.parseResponse(await response.json());
+}
 function clearResults() {
   ["system-size","panel-count","yield","self-use","self-use-detail","savings","savings-detail","payback","investment","coverage","summary"].forEach((id) => {
     el(id).textContent = "–";
@@ -80,8 +115,9 @@ function calculate() {
   if (consumption <= 0 || roofArea <= 0) return fail("Stromverbrauch und nutzbare Dachfläche müssen größer als 0 sein.");
   if (electricityPrice <= 0 || feedIn < 0 || battery < 0 || systemCost <= 0 || batteryCost < 0) return fail("Bitte prüfe Strompreis, Einspeisevergütung und Kostenangaben.");
 
+  const usePvgis = solarSource === "pvgis";
   const estimate = window.PVModel.estimate({
-    consumption, roofArea, orientation, tilt, shading, electricityPrice,
+    consumption, roofArea, orientation: usePvgis ? 1 : orientation, tilt: usePvgis ? 1 : tilt, shading, electricityPrice,
     feedIn, battery, systemCost, batteryCost, localYieldPerKwp
   });
   const {
@@ -111,7 +147,7 @@ function calculate() {
     + "Berücksichtigte Verschattung: " + Math.round((1 - shading) * 100) + " %. Mit den eingegebenen Annahmen könnten etwa " + euro.format(annualSavings)
     + " Stromkostenersparnis und Einspeiseerlöse pro Jahr entstehen. Der Eigenverbrauch deckt rechnerisch rund "
     + gridCoverage.toLocaleString("de-DE", {maximumFractionDigits: 0}) + " % deines Jahresbedarfs."
-    + (selectedLocation ? " Standort: " + selectedLocation.name + ". Lokaler Ertragsrichtwert: " + number.format(localYieldPerKwp) + " kWh/kWp/Jahr." : " Es wird ein allgemeiner Richtwert von 950 kWh/kWp/Jahr verwendet.");
+    + (selectedLocation ? " Standort: " + selectedLocation.name + ". Ertragsbasis: " + number.format(localYieldPerKwp) + " kWh/kWp/Jahr (" + (usePvgis ? "PVGIS 5.3" : solarSource === "open-meteo" ? "Open-Meteo-Schätzung" : "allgemeiner Richtwert") + ")." : " Es wird ein allgemeiner Richtwert von 950 kWh/kWp/Jahr verwendet.");
 }
 function renderMonthlyProduction(annualYield) {
   const container = el("monthly-yield");
@@ -141,7 +177,9 @@ function renderMonthlyProduction(annualYield) {
     item.append(amount, track, label);
     container.append(item);
   });
-  el("monthly-status").textContent = "Verteilung aus historischen täglichen Globalstrahlungsdaten von Open-Meteo (2021–2025), gemittelt über vollständige Jahre und auf den geschätzten Jahresertrag skaliert. Kein PVGIS-Ergebnis und keine Ertragsgarantie.";
+  el("monthly-status").textContent = solarSource === "pvgis"
+    ? "Monatliche Ertragswerte aus PVGIS 5.3 für die gewählte Koordinate, Dachneigung und Dachausrichtung; auf die berechnete Anlagengröße skaliert. Keine Ertragsgarantie."
+    : "Verteilung aus historischen täglichen Globalstrahlungsdaten von Open-Meteo (2021–2025), gemittelt über vollständige Jahre und auf den geschätzten Jahresertrag skaliert. Kein PVGIS-Ergebnis und keine Ertragsgarantie.";
 }
 
 async function loadSolarEstimate(lat, lon, label) {
@@ -159,12 +197,35 @@ async function loadSolarEstimate(lat, lon, label) {
   findNearbyBuildings(lat, lon);
   localYieldPerKwp = 950;
   window.PVAppLocalYield = localYieldPerKwp;
-  locationStatus.textContent = "Standort erkannt. Lokale Sonneneinstrahlung wird geladen …";
+  locationStatus.textContent = "Standort erkannt. Solardaten werden geladen …";
   locationDetails.hidden = true;
+  setSolarSourceStatus("pending");
   calculate();
   // Auf Mobilgeräten das Ergebnis direkt nach der Standortwahl sichtbar machen.
   resultsPanel.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  let pvgisFallbackReason = "";
   try {
+    if (window.PVGIS_PROXY_URL) {
+      try {
+        const pvgis = await fetchPvgisEstimate(lat, lon);
+        if (requestId !== locationRequest) return;
+        if (pvgis) {
+          localYieldPerKwp = pvgis.annualYieldKwhPerKwp;
+          monthlyRadiationProfile = pvgis.monthlyYieldKwhPerKwp;
+          window.PVAppLocalYield = localYieldPerKwp;
+          setSolarSourceStatus("pvgis", "PVGIS 5.3 · 1 kWp Referenzanlage · 14 % Systemverluste");
+          locationStatus.textContent = "PVGIS 5.3: standortbezogene Jahres- und Monatswerte erfolgreich geladen.";
+          locationDetails.textContent = label + " · " + Number(lat).toFixed(4) + "°, " + Number(lon).toFixed(4) + "° · PVGIS-Ertrag: " + number.format(localYieldPerKwp) + " kWh/kWp/Jahr.";
+          locationDetails.hidden = false;
+          calculate();
+          return;
+        }
+      } catch (error) {
+        pvgisFallbackReason = error.message || "PVGIS-Proxy nicht erreichbar";
+      }
+    } else {
+      pvgisFallbackReason = "PVGIS-Proxy-URL ist noch nicht konfiguriert";
+    }
     const start = "2021-01-01";
     const end = "2025-12-31";
     const url = "https://archive-api.open-meteo.com/v1/archive?latitude=" + encodeURIComponent(lat)
@@ -215,7 +276,8 @@ async function loadSolarEstimate(lat, lon, label) {
     );
     localYieldPerKwp = Math.max(650, Math.min(1250, avgAnnualKwhM2 * 0.80));
     window.PVAppLocalYield = localYieldPerKwp;
-    locationStatus.textContent = "Standort und lokale Klimadaten geladen. Verwendet werden " + completeYears.length + " vollständige Kalenderjahre aus dem Zeitraum 2021–2025.";
+    setSolarSourceStatus("open-meteo", pvgisFallbackReason ? "PVGIS-Fallback: " + pvgisFallbackReason : "PVGIS-Proxy nicht aktiviert");
+    locationStatus.textContent = (pvgisFallbackReason ? "PVGIS nicht verfügbar (" + pvgisFallbackReason + "). " : "") + "Standort und lokale Klimadaten geladen. Verwendet werden " + completeYears.length + " vollständige Kalenderjahre aus dem Zeitraum 2021–2025.";
     locationDetails.textContent = label + " · " + Math.abs(Number(lat)).toFixed(4) + "° " + (lat >= 0 ? "N" : "S") + ", " + Math.abs(Number(lon)).toFixed(4) + "° " + (lon >= 0 ? "E" : "W") + " · geschätzter Ertrag: " + number.format(localYieldPerKwp) + " kWh/kWp/Jahr.";
     locationDetails.hidden = false;
   } catch (error) {
@@ -223,6 +285,7 @@ async function loadSolarEstimate(lat, lon, label) {
     monthlyRadiationProfile = null;
     localYieldPerKwp = 950;
     window.PVAppLocalYield = localYieldPerKwp;
+    setSolarSourceStatus("default", "PVGIS und Open-Meteo nicht verfügbar");
     locationStatus.textContent = "Standort gespeichert, aber lokale Klimadaten sind gerade nicht erreichbar. Es wird vorläufig der allgemeine Richtwert verwendet.";
     locationDetails.textContent = label + " · " + Number(lat).toFixed(4) + "°, " + Number(lon).toFixed(4) + "° · 950 kWh/kWp/Jahr (allgemeiner Richtwert).";
     locationDetails.hidden = false;
@@ -287,6 +350,27 @@ locateButton.addEventListener("click", () => {
 form.addEventListener("input", calculate);
 form.addEventListener("change", calculate);
 form.addEventListener("reset", () => setTimeout(calculate, 0));
+async function refreshPvgisForConfiguration() {
+  if (!selectedLocation || !["pvgis", "pending"].includes(solarSource) || !window.PVGIS_PROXY_URL) return;
+  const requestId = ++locationRequest;
+  locationStatus.textContent = "PVGIS berechnet die geänderte Dachausrichtung bzw. Dachneigung neu …";
+  try {
+    const pvgis = await fetchPvgisEstimate(selectedLocation.lat, selectedLocation.lon);
+    if (requestId !== locationRequest) return;
+    localYieldPerKwp = pvgis.annualYieldKwhPerKwp;
+    monthlyRadiationProfile = pvgis.monthlyYieldKwhPerKwp;
+    window.PVAppLocalYield = localYieldPerKwp;
+    setSolarSourceStatus("pvgis", "PVGIS 5.3 · aktualisierte Dachparameter");
+    locationStatus.textContent = "PVGIS 5.3: Ertrag für die geänderte Dachausrichtung bzw. Dachneigung aktualisiert.";
+    calculate();
+  } catch (error) {
+    if (requestId !== locationRequest) return;
+    locationStatus.textContent = "PVGIS-Neuberechnung fehlgeschlagen. Die Open-Meteo-Schätzung wird neu geladen.";
+    await loadSolarEstimate(selectedLocation.lat, selectedLocation.lon, selectedLocation.name);
+  }
+}
+el("orientation").addEventListener("change", refreshPvgisForConfiguration);
+el("tilt").addEventListener("change", refreshPvgisForConfiguration);
 
 function csvCell(value) {
   return '"' + String(value ?? "").replace(/"/g, '""') + '"';
@@ -299,6 +383,7 @@ function exportResultsCsv() {
   const rows = [
     ["PV-Rechner Deutschland – unverbindliche Schätzung"],
     ["Standort", selectedLocation?.name || "Allgemeiner Richtwert"],
+    ["Datenquelle", solarSource === "pvgis" ? "PVGIS 5.3" : solarSource === "open-meteo" ? "Open-Meteo 2021–2025 (vereinfachte Schätzung)" : "Allgemeiner Richtwert"],
     ["Ertragsannahme", localYieldPerKwp + " kWh/kWp/Jahr"],
     ["Jährlicher Stromverbrauch (kWh)", el("consumption").value],
     ["Nutzbare Dachfläche (m²)", el("roof-area").value],
