@@ -64,3 +64,8 @@ MIT. Siehe LICENSE.
 ## Gewerbliche Einrichtung für Installationsbetriebe
 
 Eine transparente B2B-Angebotsgrundlage mit Funktionsumfang, Grenzen, Lizenzhinweisen und Freigabekriterien steht in [`docs/COMMERCIAL_OFFER_DE.md`](docs/COMMERCIAL_OFFER_DE.md). Der aktuelle Stand ist noch nicht für einen uneingeschränkten kommerziellen Livebetrieb freigegeben; die offenen technischen und rechtlichen Punkte sind dort ausdrücklich dokumentiert.
+
+
+## PVGIS aktivieren
+
+Die einmalige Cloudflare-Konfiguration und die erforderlichen GitHub Actions Secrets sind in [`docs/PVGIS-AKTIVIERUNG.md`](docs/PVGIS-AKTIVIERUNG.md) beschrieben. Bis zum erfolgreichen Worker-Deploy und Live-Test bleibt die Open-Meteo-Schätzung aktiv.
