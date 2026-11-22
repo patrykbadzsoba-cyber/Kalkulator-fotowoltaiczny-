@@ -147,7 +147,7 @@ function calculate() {
     + "Berücksichtigte Verschattung: " + Math.round((1 - shading) * 100) + " %. Mit den eingegebenen Annahmen könnten etwa " + euro.format(annualSavings)
     + " Stromkostenersparnis und Einspeiseerlöse pro Jahr entstehen. Der Eigenverbrauch deckt rechnerisch rund "
     + gridCoverage.toLocaleString("de-DE", {maximumFractionDigits: 0}) + " % deines Jahresbedarfs."
-    + (selectedLocation ? " Standort: " + selectedLocation.name + ". Ertragsbasis: " + number.format(localYieldPerKwp) + " kWh/kWp/Jahr (" + (usePvgis ? "PVGIS 5.3" : "Open-Meteo/vereinfachter Richtwert") + ")." : " Es wird ein allgemeiner Richtwert von 950 kWh/kWp/Jahr verwendet.");
+    + (selectedLocation ? " Standort: " + selectedLocation.name + ". Ertragsbasis: " + number.format(localYieldPerKwp) + " kWh/kWp/Jahr (" + (usePvgis ? "PVGIS 5.3" : solarSource === "open-meteo" ? "Open-Meteo-Schätzung" : "allgemeiner Richtwert") + ")." : " Es wird ein allgemeiner Richtwert von 950 kWh/kWp/Jahr verwendet.");
 }
 function renderMonthlyProduction(annualYield) {
   const container = el("monthly-yield");
