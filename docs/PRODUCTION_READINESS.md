@@ -35,6 +35,7 @@ Im Repository vorhanden:
 
 Noch nicht bestätigt:
 - erfolgreicher Cloudflare-Worker-Deploy;
+- Die letzte dokumentierte Deploy-Ausführung am 21.11.2026 scheiterte bereits bei der Secret-Prüfung: `CLOUDFLARE_API_TOKEN` und `CLOUDFLARE_ACCOUNT_ID` waren leer; deshalb wurde kein Worker veröffentlicht.
 - konfigurierte `PVGIS_RATE_LIMITER`-Binding (20 Anfragen pro Minute und Client-IP; Cloudflare beschreibt diese Limits als approximativ und pro Standort);
 - aktive Worker-URL;
 - erfolgreicher Live-Aufruf mit erlaubtem CORS-Origin;
@@ -44,6 +45,8 @@ Noch nicht bestätigt:
 Der Client darf PVGIS nicht direkt aus dem Browser aufrufen. Bis Proxy-Deploy und Live-Test abgeschlossen sind, muss die App ihre vorhandene Open-Meteo-Schätzung klar als Schätzung kennzeichnen. Es darf keine PVGIS-Integration behauptet werden.
 
 ### Cloudflare-Voraussetzungen
+
+Die Schritt-für-Schritt-Anleitung zur einmaligen Aktivierung liegt in `docs/PVGIS-AKTIVIERUNG.md`.
 
 Der Deploy-Workflow benötigt die GitHub-Actions-Secrets:
 - `CLOUDFLARE_API_TOKEN` — Cloudflare API Token mit Workers Scripts: Edit.
