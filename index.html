@@ -11,6 +11,8 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
   <script src="pv-model.js" defer></script>
   <script src="quantum-engine.js" defer></script>
+  <script src="pvgis-config.js" defer></script>
+  <script src="pvgis-client.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -74,8 +76,8 @@
           <input id="roof-area" type="number" min="6" max="500" step="1" value="50" required>
           <div class="field-hint">Abzüglich Fenster, Gauben und dauerhaft verschatteter Flächen.</div>
           <div class="two-columns">
-            <div><label for="orientation">Dachausrichtung</label><select id="orientation"><option value="1">Süd</option><option value="0.94">Südost / Südwest</option><option value="0.85" selected>Ost / West</option><option value="0.72">Nordost / Nordwest</option><option value="0.62">Nord</option></select></div>
-            <div><label for="tilt">Dachneigung</label><select id="tilt"><option value="0.92">Flach (0–10°)</option><option value="0.98">Leicht (11–25°)</option><option value="1" selected>Mittel (26–40°)</option><option value="0.96">Steil (41–60°)</option><option value="0.88">Sehr steil (über 60°)</option></select></div>
+            <div><label for="orientation">Dachausrichtung</label><select id="orientation"><option value="1" data-pvgis-aspect="0">Süd</option><option value="0.94" data-pvgis-aspect="-45">Südost</option><option value="0.94" data-pvgis-aspect="45">Südwest</option><option value="0.85" data-pvgis-aspect="-90" selected>Ost</option><option value="0.85" data-pvgis-aspect="90">West</option><option value="0.72" data-pvgis-aspect="-135">Nordost</option><option value="0.72" data-pvgis-aspect="135">Nordwest</option><option value="0.62" data-pvgis-aspect="180">Nord</option></select></div>
+            <div><label for="tilt">Dachneigung</label><select id="tilt"><option value="0.92" data-pvgis-angle="5">Flach (0–10°)</option><option value="0.98" data-pvgis-angle="18">Leicht (11–25°)</option><option value="1" data-pvgis-angle="33" selected>Mittel (26–40°)</option><option value="0.96" data-pvgis-angle="50">Steil (41–60°)</option><option value="0.88" data-pvgis-angle="65">Sehr steil (über 60°)</option></select></div>
           </div>
           <label for="shading">Verschattung (geschätzter Ertragsverlust)</label>
           <select id="shading"><option value="1">Keine / kaum Verschattung</option><option value="0.9">Leicht (ca. 10 %)</option><option value="0.8" selected>Mittel (ca. 20 %)</option><option value="0.65">Stark (ca. 35 %)</option></select>
@@ -120,6 +122,7 @@
           </section>
           <section class="monthly-panel" aria-labelledby="monthly-title">
             <div class="monthly-heading"><h4 id="monthly-title">Geschätzte Solarproduktion je Monat</h4><span>kWh/Monat</span></div>
+            <p id="solar-source-status" class="monthly-status" role="status">Datenquelle: allgemeiner Richtwert – keine standortbezogene Simulation.</p>
             <p id="monthly-status" class="monthly-status" role="status">Wähle einen Standort, um ein monatliches Strahlungsprofil zu laden.</p>
             <div id="monthly-yield" class="monthly-chart" aria-label="Monatliche geschätzte Solarproduktion"></div>
           </section>
@@ -128,7 +131,7 @@
           <div id="partner-cta" class="partner-cta" hidden><div><strong id="partner-cta-title">Nächster Schritt</strong><p>Du möchtest deine Planung mit einem Fachbetrieb besprechen? Öffne direkt dessen Kontaktseite.</p></div><a id="partner-cta-link" href="#" target="_blank" rel="noopener noreferrer">Beratung anfragen <span aria-hidden="true">↗</span></a></div>
           <section class="methodology-box" aria-label="Datenquellen und Grenzen der Berechnung">
             <strong>So transparent ist diese Berechnung</strong>
-            <p>Die standortbezogene Ertrags-Schätzung nutzt historische Globalstrahlungsdaten von Open-Meteo. Sie ist derzeit keine PVGIS-Simulation und keine stündliche Anlagen- oder Verbrauchssimulation. Dachfläche, Ausrichtung, Neigung und Verschattung müssen vom Nutzer geprüft werden; der Gebäudeumriss aus OpenStreetMap ist keine Dachvermessung.</p>
+            <p>Wenn der PVGIS-Proxy aktiviert und erreichbar ist, nutzt die standortbezogene Ertragsberechnung PVGIS 5.3 mit 1 kWp Referenzleistung und 14 % Systemverlusten. Ohne konfigurierten oder erreichbaren Proxy fällt die App transparent auf historische Globalstrahlungsdaten von Open-Meteo und ein vereinfachtes Jahresmodell zurück. Es gibt keine stündliche Verbrauchs- oder Speicher-Simulation. Dachfläche, Ausrichtung, Neigung und Verschattung müssen vom Nutzer geprüft werden; der Gebäudeumriss aus OpenStreetMap ist keine Dachvermessung.</p>
             <p>Eigenverbrauch und Speicherwirkung beruhen auf einem vereinfachten Jahresmodell. Die angezeigten Euro-Beträge sind Szenario-Schätzungen aus deinen Preisangaben – keine garantierte Ersparnis. Fehlen Standort- oder Klimadaten, wird der allgemeine Richtwert ausdrücklich gekennzeichnet.</p>
           </section>
           <p class="disclaimer">Die Amortisationszeit ist eine vereinfachte Modellrechnung aus geschätzter Investition und jährlichem Nutzen. Sie berücksichtigt insbesondere keine Steuern, Finanzierungskosten, laufenden Betriebs-, Wartungs- oder Reparaturkosten und mögliche Änderungen von Strompreis und Einspeisevergütung. Vor einer Investition sind Dach, Statik, Verschattung, Netzanschluss, Anlagenkonfiguration und aktuelle Vergütung durch einen Fachbetrieb zu prüfen. Die Berechnung ersetzt kein technisches Angebot.</p>
