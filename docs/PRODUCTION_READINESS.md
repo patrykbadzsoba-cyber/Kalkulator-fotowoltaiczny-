@@ -58,9 +58,9 @@ Außerdem muss die `workers.dev`-Subdomain des Kontos aktiviert sein. Diese Kont
 
 - Pull Request #8 (Monatsproduktion und Tests) ist in `main` gemergt.
 - Pull Request #6 (PVGIS-Proxy-Vorbereitung und Produktionsreife-Dokumentation) ist in `main` gemergt.
-- Für Commit `2a4285c4a203639e294433529603ea45ea629368` wurde der GitHub-Pages-Workflow am 21.11.2026 um 11:51 UTC erfolgreich abgeschlossen.
-- Für spätere Main-Commits `acd3c568d790b1600f790af4fb31387f68305637` und `6e604a7652b573b4e8349f5c5f46dbe85ef03624` meldete GitHub Actions `startup_failure`. Diese Runs hatten keine angelegten Jobs. Daher ist ein erfolgreiches Deployment des neuesten Main-Commits nicht bestätigt.
-- Der Cloudflare-Deploy-Workflow für Commit `2a4285c4a203639e294433529603ea45ea629368` endete mit `failure`; der spätere Run endete mit `startup_failure`. Ein erfolgreicher Worker-Deploy ist nicht belegt.
+- Für den nach PR #15 gemergten Main-Commit `1e00261bae9828b4df16556a9927b3258a9fb877` wurde der GitHub-Pages-Workflow am 22.11.2026 um 11:26 UTC erfolgreich abgeschlossen. GitHub meldete `Reported success`; die veröffentlichte URL ist https://patrykbadzsoba-cyber.github.io/Kalkulator-fotowoltaiczny-/.
+- Die Pages-Veröffentlichung führte vor dem Deploy die Quelltextprüfung und `node --test` aus; der Workflow endete erfolgreich.
+- Der Cloudflare-Deploy-Workflow für denselben Commit endete am 22.11.2026 mit `failure`, weil `CLOUDFLARE_API_TOKEN` und `CLOUDFLARE_ACCOUNT_ID` in GitHub Actions leer waren. Die Schritte zur Quelltextprüfung und zum Deploy wurden übersprungen. Es wurde kein Worker veröffentlicht.
 
 Die erfolgreiche ältere Pages-Ausführung beweist nicht, dass der neueste Stand live ist. Die öffentliche URL muss nach einem erfolgreichen aktuellen Deployment separat per HTTP und Browser getestet werden.
 
