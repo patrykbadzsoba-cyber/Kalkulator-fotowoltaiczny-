@@ -28,7 +28,7 @@
     const annual = Number(payload?.annualYieldKwhPerKwp);
     const monthly = payload?.monthlyYieldKwhPerKwp;
     if (!Number.isFinite(annual) || annual <= 0 || !Array.isArray(monthly) ||
-        monthly.length !== 12 || monthly.some(value => !Number.isFinite(Number(value)) || Number(value) < 0)) {
+        monthly.length !== 12 || monthly.some(value => !Number.isFinite(value) || value < 0) || monthly.reduce((sum, value) => sum + value, 0) <= 0) {
       throw new TypeError("PVGIS response does not contain a valid annual yield and 12 monthly values.");
     }
     return { annualYieldKwhPerKwp: annual, monthlyYieldKwhPerKwp: monthly.map(Number) };
