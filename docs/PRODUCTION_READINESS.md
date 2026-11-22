@@ -28,12 +28,14 @@ Die Hauptversion enthält jetzt zusätzlich eine interaktive OpenStreetMap-Karte
 ## 3. PVGIS-Proxy — vorbereitet, aber nicht produktiv integriert
 
 Im Repository vorhanden:
-- `worker/pvgis-proxy.js`: Cloudflare Worker-Proxy für PVGIS 5.3 mit Parameterprüfung, CORS-Allowlist, Timeout, Antwortprüfung und Cache.
+- `worker/pvgis-proxy.js`: Cloudflare Worker-Proxy für PVGIS 5.3 mit Parameterprüfung, CORS-Allowlist, Timeout, Antwortprüfung und Rate-Limit-Binding.
+- `pvgis-client.js` und `pvgis-config.js`: Frontend-Client und bewusst leere Proxy-URL-Konfiguration. Die echte Worker-URL wird erst nach erfolgreichem Cloudflare-Deploy eingetragen.
 - `wrangler.toml`: Worker-Konfiguration.
 - `.github/workflows/deploy-pvgis-worker.yml`: Workflow für die Bereitstellung bei Änderungen an Worker-Dateien.
 
 Noch nicht bestätigt:
 - erfolgreicher Cloudflare-Worker-Deploy;
+- konfigurierte `PVGIS_RATE_LIMITER`-Binding (20 Anfragen pro Minute und Client-IP; Cloudflare beschreibt diese Limits als approximativ und pro Standort);
 - aktive Worker-URL;
 - erfolgreicher Live-Aufruf mit erlaubtem CORS-Origin;
 - Integration der Worker-URL in das Frontend;
@@ -96,6 +98,6 @@ Die Anwendung darf erst als vollständig produktionsreif oder als PVGIS-basiert 
 
 1. Einen neuen erfolgreichen Pages-Workflow auf dem aktuellen `main` erzielen und die öffentliche URL verifizieren.
 2. Cloudflare-Secrets und `workers.dev`-Subdomain prüfen; Worker deployen und die URL ermitteln.
-3. Worker-URL in die Frontend-Konfiguration integrieren; PVGIS-Jahres- und Monatswerte nur nach erfolgreichem Live-Test verwenden.
+3. Die echte Worker-URL in `pvgis-config.js` eintragen und PVGIS-Jahres- und Monatswerte per Live-Test verifizieren.
 4. Neue interaktive Kartenwahl nach erfolgreichem Pages-Deploy auf Smartphone und Desktop testen; hausnummerngenaue Adressbestätigung ist weiterhin nicht implementiert.
 5. Browser-End-to-End-Tests und rechtliche Betreiberangaben abschließen.
