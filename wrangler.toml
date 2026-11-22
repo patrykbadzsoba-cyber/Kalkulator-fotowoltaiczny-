@@ -5,3 +5,12 @@ workers_dev = true
 
 [vars]
 APP_ORIGIN = "https://patrykbadzsoba-cyber.github.io"
+
+# Approximate per-client request throttle. Cloudflare applies this per location.
+[[ratelimits]]
+name = "PVGIS_RATE_LIMITER"
+namespace_id = "2026112201"
+
+  [ratelimits.simple]
+  limit = 20
+  period = 60
