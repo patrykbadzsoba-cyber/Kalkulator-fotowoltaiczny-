@@ -351,7 +351,7 @@ form.addEventListener("input", calculate);
 form.addEventListener("change", calculate);
 form.addEventListener("reset", () => setTimeout(calculate, 0));
 async function refreshPvgisForConfiguration() {
-  if (!selectedLocation || solarSource !== "pvgis" || !window.PVGIS_PROXY_URL) return;
+  if (!selectedLocation || !["pvgis", "pending"].includes(solarSource) || !window.PVGIS_PROXY_URL) return;
   const requestId = ++locationRequest;
   locationStatus.textContent = "PVGIS berechnet die geänderte Dachausrichtung bzw. Dachneigung neu …";
   try {
