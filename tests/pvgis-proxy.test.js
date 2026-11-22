@@ -95,6 +95,20 @@ test("returns 502 when PVGIS responds with an error", async () => {
     assert.equal(response.status, 502);
   });
 });
+test("rejects zero or missing monthly energy values from PVGIS", async () => {
+  await withFetch(async () => new Response(JSON.stringify({
+    outputs: { totals: { fixed: { E_y: 1000 } }, monthly: { fixed: Array(12).fill({ month: 1, E_m: 0 }) } }
+  }), { status: 200 }), async () => {
+    const response = await invoke(request());
+    assert.equal(response.status, 502);
+  });
+  await withFetch(async () => new Response(JSON.stringify({
+    outputs: { totals: { fixed: { E_y: 1000 } }, monthly: { fixed: [{ month: 1 }, ...monthly.slice(1)] } }
+  }), { status: 200 }), async () => {
+    const response = await invoke(request());
+    assert.equal(response.status, 502);
+  });
+});
 test("rejects incomplete monthly data from PVGIS", async () => {
   await withFetch(async () => new Response(JSON.stringify({
     outputs: { totals: { fixed: { E_y: 1000 } }, monthly: { fixed: monthly.slice(0, 11) } }
